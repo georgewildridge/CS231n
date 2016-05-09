@@ -55,30 +55,30 @@ The image with the smallest distance between the two is considered to be the mos
 <a id="two-loops" class="anchor" href="#two-loops" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Two Loops</h3>
 
 <p>Converting the equation into numpy operations:
-    num_test = X.shape[0]
-    num_train = self.X_train.shape[0]
-    dists = np.zeros((num_test, num_train))
-    for i in xrange(num_test):
-          for j in xrange(num_train):
-            dists[i,j] = np.sqrt(np.sum(np.square(X[i]-self.X_train[j])))
-    return dists
+        num_test = X.shape[0]
+        num_train = self.X_train.shape[0]
+        dists = np.zeros((num_test, num_train))
+        for i in xrange(num_test):
+            for j in xrange(num_train):
+                dists[i,j] = np.sqrt(np.sum(np.square(X[i]-self.X_train[j])))
+        return dists
 Where X[i] is the image we are attempting to find the class for and X_train[j] is the remainder of the images in the training set.</p>
 
 <h3>
 <a id="one-loop" class="anchor" href="#one-loop" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>One Loop</h3>
 
 <p>Reducing the same operation to one loop
-    for i in xrange(num_test):
-        dists[i,:] = np.sqrt(np.sum(np.square(X[i,:]-self.X_train),axis =1))
-    return dists
+        for i in xrange(num_test):
+            dists[i,:] = np.sqrt(np.sum(np.square(X[i,:]-self.X_train),axis =1))
+        return dists
 The important thing to understand in this case is what exactly something like dists[i,:] is doing. From playing around with it and from the <a href="http://cs231n.github.io/python-numpy-tutorial/">python tutorial</a>, I figured out that his would represent every column in row i. So basically I am saying that every column in row i of dists is equal to the Euclidean distance of every column of row i minus every image in the dataset. </p>
 
 <h3>
 <a id="no-loops" class="anchor" href="#no-loops" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>No Loops</h3>
 
 <p>Now we take it a step further, computing the euclidean distance without loops:
-    dists = np.sqrt((X<strong>2).sum(axis=1)[:, np.newaxis] + (self.X_train</strong>2).sum(axis=1) - 2 * X.dot(self.X_train.T))
-    return dists
+        dists = np.sqrt((X<strong>2).sum(axis=1)[:, np.newaxis] + (self.X_train</strong>2).sum(axis=1) - 2 * X.dot(self.X_train.T))
+        return dists
 To put this into perspective I will do it on a much simpler scale. Instead of dealing with these huge matricies, pretend we are just working with two vectors, q and p. To find the <a href="https://en.wikipedia.org/wiki/Euclidean_distance">Euclidean distance</a> between these two vectors we find the length of its distance vector:
 <img src="https://upload.wikimedia.org/math/c/5/4/c54c79bb419dec31d93260cb9207a1d5.png" alt="Euclidean length of distance vector">
 Otherwise written as:
@@ -88,8 +88,7 @@ Alright, now that we understand how to find the length of the two vector's dista
 <h2>
 <a id="support-vector-machine" class="anchor" href="#support-vector-machine" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Support Vector Machine</h2>
 
-<pre><code>        i. 
-        ii. S is a vector of class scores, safety margin of 1 (scores are scale free, arbitrary choice). J is the incorrect classes why yi is the correct class.
+<pre><code>        ii. S is a vector of class scores, safety margin of 1 (scores are scale free, arbitrary choice). J is the incorrect classes why yi is the correct class.
         iii. It taking the scores of the incorrect classes subtracting the scores of the correct classes and adding one, next the max is taken of the two points 0 or the loss. This clamps values at zero (if a negative loss is associated, only a zero will be passed through)so the negative losses don’t have a bearing on the overall loss of the function as the negative loss would decrease the overall loss, making the loss seem smaller then it actually is. Importantly the loss score is not calculated when j = yi as this would give a value of one(where it should be 0) which has a non universal affect on the overall loss (bad). Finally all the losses over all the classes are averaged (see equation below) to find a single loss number.  (3:00 - 9:45)
             1) 
         iv. Hyperparamter
