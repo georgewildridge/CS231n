@@ -1,53 +1,109 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en-us">
   <head>
-    <meta charset='utf-8'>
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <meta name="description" content="CS231n : Following Stanford&#39;s course &quot;Convolutional Neural Networks for Visual Recognition&quot;">
-
-    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
-
-    <title>CS231n</title>
+    <meta charset="UTF-8">
+    <title>CS231n by georgewildridge</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
   </head>
-
   <body>
+    <section class="page-header">
+      <h1 class="project-name">CS231n</h1>
+      <h2 class="project-tagline">Following Stanford&#39;s course &quot;Convolutional Neural Networks for Visual Recognition&quot;</h2>
+      <a href="https://github.com/georgewildridge/CS231n" class="btn">View on GitHub</a>
+      <a href="https://github.com/georgewildridge/CS231n/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/georgewildridge/CS231n/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
 
-    <!-- HEADER -->
-    <div id="header_wrap" class="outer">
-        <header class="inner">
-          <a id="forkme_banner" href="https://github.com/georgewildridge/CS231n">View on GitHub</a>
-
-          <h1 id="project_title">CS231n</h1>
-          <h2 id="project_tagline">Following Stanford&#39;s course &quot;Convolutional Neural Networks for Visual Recognition&quot;</h2>
-
-            <section id="downloads">
-              <a class="zip_download_link" href="https://github.com/georgewildridge/CS231n/zipball/master">Download this project as a .zip file</a>
-              <a class="tar_download_link" href="https://github.com/georgewildridge/CS231n/tarball/master">Download this project as a tar.gz file</a>
-            </section>
-        </header>
-    </div>
-
-    <!-- MAIN CONTENT -->
-    <div id="main_content_wrap" class="outer">
-      <section id="main_content" class="inner">
-        <h1>
+    <section class="main-content">
+      <h1>
 <a id="assignment-1" class="anchor" href="#assignment-1" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Assignment 1</h1>
 
 <h2>
 <a id="k-nearest-neighbor" class="anchor" href="#k-nearest-neighbor" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>K-Nearest Neighbor</h2>
-      </section>
-    </div>
 
-    <!-- FOOTER  -->
-    <div id="footer_wrap" class="outer">
-      <footer class="inner">
-        <p class="copyright">CS231n maintained by <a href="https://github.com/georgewildridge">georgewildridge</a></p>
-        <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
+<pre><code>2. Nearest Neighbor Classifier
+    a. Given a giant dataset
+    b. Remember all the training data
+    c. Compare a test image to every picture in the training data
+        i. Images are classified based on their degree of similarity to other images in the dataset and the image with the most similarities class
+    d. How to compare the two pictures from the test and training datasets:
+        i. Looking at the distances between pixels at the same location of the two images
+        ii. Hyperparameters: a discrete choice that the user has control over, not obvious how to set it, the user has to make the dicision on how to set it. Problem dependent, must try a range to see what works best
+            1) Manhattan/L1 Distance: (11:25)
+                a) 
+                b) Take the distance between the two pixels, then add the values of all the different pixels together to retrieve a final result, finally take the index of the training examples that has the lowest final result and apply that classifier to the test image
+            2) Euclidean/L2 distance
+                a) 
+            3) k-Nearest Neighbor
+</code></pre>
+
+<p>Retrieve the k closest training images to the test image and select the class that the majority of the k images are closest to.</p>
+
+<h2>
+<a id="support-vector-machine" class="anchor" href="#support-vector-machine" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Support Vector Machine</h2>
+
+<pre><code>        i. 
+        ii. S is a vector of class scores, safety margin of 1 (scores are scale free, arbitrary choice). J is the incorrect classes why yi is the correct class.
+        iii. It taking the scores of the incorrect classes subtracting the scores of the correct classes and adding one, next the max is taken of the two points 0 or the loss. This clamps values at zero (if a negative loss is associated, only a zero will be passed through)so the negative losses don’t have a bearing on the overall loss of the function as the negative loss would decrease the overall loss, making the loss seem smaller then it actually is. Importantly the loss score is not calculated when j = yi as this would give a value of one(where it should be 0) which has a non universal affect on the overall loss (bad). Finally all the losses over all the classes are averaged (see equation below) to find a single loss number.  (3:00 - 9:45)
+            1) 
+        iv. Hyperparamter
+            1) This is known as the hinge loss
+            2) There is also the squared hinge loss (will change what is actually happens.. But occasionally works better):
+                a) 
+        v. Now we have two theoretically working equation of: 
+            1) 
+            2) This would not implement correctly however because if the weights are universally multiplied by a constant the issue would arrise that if L equalled 0 and the weights were multiplied, L would still equal 0 by nature of this equation despite, using logic, the weights not having an equivalent distance from eachother (19:00 - 20:00)
+                a) To solve this we introduce regularization
+        vi. Weight Regularization –Not sold I am not sure I fully understand this
+            1) 
+            2)  Lamda is a hyperparameter that allows you to adjust the strenght of regularization
+            3)  Regularization measures the niceness of the w, trading off the training loss with the generalization loss. 
+                a) Generally L2 regulariation is used (see slide 23)
+                b) Takes into account more data, diffuses the data, puts more emphasis on each point
+                c) 9
+</code></pre>
+
+<h1>
+<a id="linear-classifier" class="anchor" href="#linear-classifier" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Linear Classifier</h1>
+
+<pre><code>    a. Parametric Approach:
+        i. Constructing a function that takes an image and produces the scores for the classses (which class the image belongs to), the function is  a function of both the image and the parameters. The goal is for the funciton to provide a higher score for the correct labels, (labels a cat picture a cat) and a lower score for the rest of the classes. To do this we change the paramaters also know as the weights. 
+            1) 
+            2) X, being the image's pixels stretched into one column, W being the parameters and is the number of classes by the number of pixels in the image. Sometimes +b is added to the function to account for bias's (majority of the pictures in a dataset are cats, we want it to generally spit out cat then)
+    b. Interpreting a Linear Classifer (4200)
+        i. Every score is a weighted sum of all the pixel values of the image. It is counting up colors of all the pixel values of these positions.
+        ii. Classifiers create the optimal way of mixing all the test images to create a template that is "compared" to the image
+</code></pre>
+
+<h2>
+<a id="softmax-classifier" class="anchor" href="#softmax-classifier" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Softmax Classifier</h2>
+
+<pre><code>    a.  A different way to specify loss from the scores generated from the classifier or the neural net
+    b.  Scores are interpretted as the "unnormalized log probabilities of the classes" so, instead of a loss function, we would basically just take the –log of the normalized scores after the scores are exponentiated to retrieve a number that we interpret as the probability of that specific class
+        i. As a loss functionthegoal is to maximize the log liklihood of the true class and minimize the –log liklyhood of the true class 
+    c. As a sanity check, when you first initialize this with random small weights the svm loss should be around the –log(1/#number of classes), as optimizing that number should be decreasing to zero
+</code></pre>
+
+<p>Maximizing log probabilities vs probablities... does the same thing. Log probs jst look nicer</p>
+
+<h2>
+<a id="two-layer-neural-network" class="anchor" href="#two-layer-neural-network" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Two-Layer Neural Network</h2>
+
+<h2>
+<a id="image-features" class="anchor" href="#image-features" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Image Features</h2>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/georgewildridge/CS231n">CS231n</a> is maintained by <a href="https://github.com/georgewildridge">georgewildridge</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
       </footer>
-    </div>
 
-    
+    </section>
 
+  
   </body>
 </html>
