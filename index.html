@@ -25,23 +25,21 @@
 <h2>
 <a id="k-nearest-neighbor" class="anchor" href="#k-nearest-neighbor" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>K-Nearest Neighbor</h2>
 
-<pre><code>2. Nearest Neighbor Classifier
-    a. Given a giant dataset
-    b. Remember all the training data
-    c. Compare a test image to every picture in the training data
-        i. Images are classified based on their degree of similarity to other images in the dataset and the image with the most similarities class
-    d. How to compare the two pictures from the test and training datasets:
-        i. Looking at the distances between pixels at the same location of the two images
-        ii. Hyperparameters: a discrete choice that the user has control over, not obvious how to set it, the user has to make the dicision on how to set it. Problem dependent, must try a range to see what works best
-            1) Manhattan/L1 Distance: (11:25)
-                a) 
-                b) Take the distance between the two pixels, then add the values of all the different pixels together to retrieve a final result, finally take the index of the training examples that has the lowest final result and apply that classifier to the test image
-            2) Euclidean/L2 distance
-                a) 
-            3) k-Nearest Neighbor
-</code></pre>
-
-<p>Retrieve the k closest training images to the test image and select the class that the majority of the k images are closest to.</p>
+<p>Nearest Neighbor Classifier
+     a. Given a giant dataset
+        b. Remember all the training data
+        c. Compare a test image to every picture in the training data
+            i. Images are classified based on their degree of similarity to other images in the dataset and the image with the most similarities class
+        d. How to compare the two pictures from the test and training datasets:
+            i. Looking at the distances between pixels at the same location of the two images
+            ii. Hyperparameters: a discrete choice that the user has control over, not obvious how to set it, the user has to make the dicision on how to set it. Problem dependent, must try a range to see what works best
+                1) Manhattan/L1 Distance: (11:25)
+                    a) 
+                    b) Take the distance between the two pixels, then add the values of all the different pixels together to retrieve a final result, finally take the index of the training examples that has the lowest final result and apply that classifier to the test image
+                2) Euclidean/L2 distance
+                    a) 
+                3) k-Nearest Neighbor
+Retrieve the k closest training images to the test image and select the class that the majority of the k images are closest to.</p>
 
 <h2>
 <a id="support-vector-machine" class="anchor" href="#support-vector-machine" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Support Vector Machine</h2>
