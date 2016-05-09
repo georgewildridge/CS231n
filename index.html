@@ -54,35 +54,46 @@ The image with the smallest distance between the two is considered to be the mos
 <h3>
 <a id="two-loops" class="anchor" href="#two-loops" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Two Loops</h3>
 
-<p>Converting the equation into numpy operations:
-        num_test = X.shape[0]
-        num_train = self.X_train.shape[0]
-        dists = np.zeros((num_test, num_train))
-        for i in xrange(num_test):
-            for j in xrange(num_train):
-                dists[i,j] = np.sqrt(np.sum(np.square(X[i]-self.X_train[j])))
-        return dists
-Where X[i] is the image we are attempting to find the class for and X_train[j] is the remainder of the images in the training set.</p>
+<p>Converting the equation into numpy operations:</p>
+
+<pre><code>num_test = X.shape[0]
+num_train = self.X_train.shape[0]
+dists = np.zeros((num_test, num_train))
+for i in xrange(num_test):
+    for j in xrange(num_train):
+        dists[i,j] = np.sqrt(np.sum(np.square(X[i]-self.X_train[j])))
+return dists
+</code></pre>
+
+<p>Where X[i] is the image we are attempting to find the class for and X_train[j] is the remainder of the images in the training set.</p>
 
 <h3>
 <a id="one-loop" class="anchor" href="#one-loop" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>One Loop</h3>
 
-<p>Reducing the same operation to one loop
-        for i in xrange(num_test):
-            dists[i,:] = np.sqrt(np.sum(np.square(X[i,:]-self.X_train),axis =1))
-        return dists
-The important thing to understand in this case is what exactly something like dists[i,:] is doing. From playing around with it and from the <a href="http://cs231n.github.io/python-numpy-tutorial/">python tutorial</a>, I figured out that his would represent every column in row i. So basically I am saying that every column in row i of dists is equal to the Euclidean distance of every column of row i minus every image in the dataset. </p>
+<p>Reducing the same operation to one loop</p>
+
+<pre><code>for i in xrange(num_test):
+    dists[i,:] = np.sqrt(np.sum(np.square(X[i,:]-self.X_train),axis =1))
+return dists
+</code></pre>
+
+<p>The important thing to understand in this case is what exactly something like dists[i,:] is doing. From playing around with it and from the <a href="http://cs231n.github.io/python-numpy-tutorial/">python tutorial</a>, I figured out that his would represent every column in row i. So basically I am saying that every column in row i of dists is equal to the Euclidean distance of every column of row i minus every image in the dataset. </p>
 
 <h3>
 <a id="no-loops" class="anchor" href="#no-loops" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>No Loops</h3>
 
-<p>Now we take it a step further, computing the euclidean distance without loops:
-        dists = np.sqrt((X<strong>2).sum(axis=1)[:, np.newaxis] + (self.X_train</strong>2).sum(axis=1) - 2 * X.dot(self.X_train.T))
-        return dists
-To put this into perspective I will do it on a much simpler scale. Instead of dealing with these huge matricies, pretend we are just working with two vectors, q and p. To find the <a href="https://en.wikipedia.org/wiki/Euclidean_distance">Euclidean distance</a> between these two vectors we find the length of its distance vector:
-<img src="https://upload.wikimedia.org/math/c/5/4/c54c79bb419dec31d93260cb9207a1d5.png" alt="Euclidean length of distance vector">
-Otherwise written as:
-<img src="https://upload.wikimedia.org/math/a/8/3/a8394d4ad1d858186f89be9c590a3ac8.png" alt="rewritten Euclidean length of distance vector">
+<p>Now we take it a step further, computing the euclidean distance without loops:</p>
+
+<pre><code>dists = np.sqrt((X**2).sum(axis=1)[:, np.newaxis] + (self.X_train**2).sum(axis=1) - 2 * X.dot(self.X_train.T))
+return dists
+</code></pre>
+
+<p>To put this into perspective I will do it on a much simpler scale. Instead of dealing with these huge matricies, pretend we are just working with two vectors, q and p. To find the <a href="https://en.wikipedia.org/wiki/Euclidean_distance">Euclidean distance</a> between these two vectors we find the length of its distance vector:</p>
+
+<p><img src="https://upload.wikimedia.org/math/c/5/4/c54c79bb419dec31d93260cb9207a1d5.png" alt="Euclidean length of distance vector">
+Otherwise written as:</p>
+
+<p><img src="https://upload.wikimedia.org/math/a/8/3/a8394d4ad1d858186f89be9c590a3ac8.png" alt="rewritten Euclidean length of distance vector">
 Alright, now that we understand how to find the length of the two vector's distance vector, the same process is applied to the bigger matrices and that’s it. </p>
 
 <h2>
