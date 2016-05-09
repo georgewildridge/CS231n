@@ -19,42 +19,71 @@
     </section>
 
     <section class="main-content">
-      <p>This will be a comprehensive review of everything I have learned along with a walk through of my code.  I will work from the big picture down to the nitty gritty of the code. If you have questions or spot a mistake feel free to tweet me at <a href="https://twitter.com/GWildridge">@GWildridge</a></p>
+      <p>This will be a comprehensive review of everything I have learned along with a walk through of my code.  I will work from the big picture down to the nitty gritty of the code. If you have questions or spot a mistake feel free to tweet me at <a href="https://twitter.com/Gwildridge">@Gwildridge</a>. A brief disclaimer that I am a highschool student and although the information on this page is correct to the best of my knowledge, I would not consider myself all-knowing on this material. </p>
 
-
+<h1>
+<a id="introduction" class="anchor" href="#introduction" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Introduction</h1>
 
 <h2>
 <a id="computer-vision" class="anchor" href="#computer-vision" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Computer Vision</h2>
 
-<p>This is the problem that Deep Learning is attempting to solve and I am attempting to learn about. The approach to understanding this has also been an approach to understanding human vision. Over the past fifty years, our understanding of human vision has been widdled down from a holistic approach where some part of our brain stores what a chair looks like to a hierarchical understanding. Hierarchical vision revolves around the understanding that our brain sees edges and that these edges define the shape. So instead of storing a chair somewhere in our brains we store a set of edges and lines that make up a chair. 
-To begin with, I would like to start with the issue that this work attempts to solve... Computer Vision. </p>
+<p>Computer vision is the problem that Deep Learning is attempting to solve and I am attempting to learn about. The approach to understanding this has also been an approach to understanding human vision. Over the past fifty years, our understanding of human vision has been widdled down from a holistic approach where some part of our brain stores what a chair looks like to a hierarchical understanding. Hierarchical vision revolves around the understanding that our brain sees edges and that these edges define the shape. So instead of storing a chair somewhere in our brains we store a set of edges and lines that make up a chair and our brain knows which objects are which upon recognition. The overarching goal is to build a 3d model of objects within the computer. 
+The first approach to solving vision was edge detection nad then moved into segmentation for feature detection. For almost sixty years, people attempted to solve vision using this method… until very recently when deep leaning began being used. Now this isn't to say that Deep Learning hadn't existed until recently, it is to say that very few focused on it as a solution because it was too computationally costly. As of 2010 deep learning was a gain popularized. </p>
+
+<h2>
+<a id="image-classification" class="anchor" href="#image-classification" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Image Classification</h2>
+
+<p>Image classification is taking an image and transform it into one of a fixed number of categories. Vision is challenging because of a number of environment variables like rotation, point of view, illumination, deformation, occlusion, background clutter and finally interclass variation. There are two approaches, the explicit approach and the data driven approach. An example of the explicit approach is the feature detection, or the association of certain characteristics with certain objects. The issue with this approach is that every time you want to classify a new object a new algorithm must be hard coded to look for those characteristics, making this method incapable of major growth. Instead, a data driven has been taken with deep learning. This involves collecting a very large dataset of images and labels. Then machine learning is used to train and image classifier on the data prior to evaluating the classifier on the test images. It is this classifier I will address next. </p>
 
 <h1>
 <a id="assignment-1" class="anchor" href="#assignment-1" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Assignment 1</h1>
 
-<p>In this assignment I will implement the k-nearest neighbor classifier, a support vector machine, the softmax classifier, backprop, a neural net and generate some features. </p>
-
-<p>T
-To begin with I want to talk about the prblem all of this is an attempt to solve... image classifcation. </p>
+<p>In this assignment I will implement the k-nearest neighbor classifier, a support vector machine, the softmax classifier, backpropagation, a neural net and generate some features. </p>
 
 <h2>
-<a id="k-nearest-neighbor" class="anchor" href="#k-nearest-neighbor" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>K-Nearest Neighbor</h2>
+<a id="k-nearest-neighbor-classifier" class="anchor" href="#k-nearest-neighbor-classifier" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>K-Nearest Neighbor Classifier</h2>
 
-<p>Nearest Neighbor Classifier
-     a. Given a giant dataset
-        b. Remember all the training data
-        c. Compare a test image to every picture in the training data
-            i. Images are classified based on their degree of similarity to other images in the dataset and the image with the most similarities class
-        d. How to compare the two pictures from the test and training datasets:
-            i. Looking at the distances between pixels at the same location of the two images
-            ii. Hyperparameters: a discrete choice that the user has control over, not obvious how to set it, the user has to make the dicision on how to set it. Problem dependent, must try a range to see what works best
-                1) Manhattan/L1 Distance: (11:25)
-                    a) 
-                    b) Take the distance between the two pixels, then add the values of all the different pixels together to retrieve a final result, finally take the index of the training examples that has the lowest final result and apply that classifier to the test image
-                2) Euclidean/L2 distance
-                    a) 
-                3) k-Nearest Neighbor
-Retrieve the k closest training images to the test image and select the class that the majority of the k images are closest to.</p>
+<p>This classifier works by comparing an image for similarities to ever other image in the dataset, and is classified based of the image(s)' class that it is most similar to. By similar I am refering to the the distance's between the two images. Two different methods can be used to find the distance, the L1/Manhattan distance:
+<img src="link" alt="Manhattan distance">
+And the L2/Euclidean distance:
+<img src="link" alt="Euclidean Distance">
+The image with the smallest distance between the two is considered to be the most similar image. However, what I just described was the nearest neighbor classifier. The K-nearest neighbor classifier is very similar. Instead of just stating the image with the smallest number is the most similar, K of the most similar images are retrieved before selecting the class that the majority of the K images have. </p>
+
+<p>In this particular assignment we were asked to implement this classifier using the Euclidean/L2 distance in three different ways: with two for loops, with one for loop and with no for loops. This is designed to introduce us to running loops in C instead of python.</p>
+
+<h3>
+<a id="two-loops" class="anchor" href="#two-loops" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Two Loops</h3>
+
+<p>Converting the equation into numpy operations:
+    num_test = X.shape[0]
+    num_train = self.X_train.shape[0]
+    dists = np.zeros((num_test, num_train))
+    for i in xrange(num_test):
+          for j in xrange(num_train):
+            dists[i,j] = np.sqrt(np.sum(np.square(X[i]-self.X_train[j])))
+    return dists
+Where X[i] is the image we are attempting to find the class for and X_train[j] is the remainder of the images in the training set.</p>
+
+<h3>
+<a id="one-loop" class="anchor" href="#one-loop" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>One Loop</h3>
+
+<p>Reducing the same operation to one loop
+    for i in xrange(num_test):
+        dists[i,:] = np.sqrt(np.sum(np.square(X[i,:]-self.X_train),axis =1))
+    return dists
+The important thing to understand in this case is what exactly something like dists[i,:] is doing. From playing around with it and from the <a href="http://cs231n.github.io/python-numpy-tutorial/">python tutorial</a>, I figured out that his would represent every column in row i. So basically I am saying that every column in row i of dists is equal to the Euclidean distance of every column of row i minus every image in the dataset. </p>
+
+<h3>
+<a id="no-loops" class="anchor" href="#no-loops" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>No Loops</h3>
+
+<p>Now we take it a step further, computing the euclidean distance without loops:
+    dists = np.sqrt((X<strong>2).sum(axis=1)[:, np.newaxis] + (self.X_train</strong>2).sum(axis=1) - 2 * X.dot(self.X_train.T))
+    return dists
+To put this into perspective I will do it on a much simpler scale. Instead of dealing with these huge matricies, pretend we are just working with two vectors, q and p. To find the <a href="https://en.wikipedia.org/wiki/Euclidean_distance">Euclidean distance</a> between these two vectors we find the length of its distance vector:
+<img src="https://upload.wikimedia.org/math/c/5/4/c54c79bb419dec31d93260cb9207a1d5.png" alt="Euclidean length of distance vector">
+Otherwise written as:
+<img src="https://upload.wikimedia.org/math/a/8/3/a8394d4ad1d858186f89be9c590a3ac8.png" alt="rewritten Euclidean length of distance vector">
+Alright, now that we understand how to find the length of the two vector's distance vector, the same process is applied to the bigger matrices and that’s it. </p>
 
 <h2>
 <a id="support-vector-machine" class="anchor" href="#support-vector-machine" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Support Vector Machine</h2>
