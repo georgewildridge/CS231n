@@ -19,7 +19,9 @@
     </section>
 
     <section class="main-content">
-      <p>This will be a comprehensive review of everything I have learned along with a walk through of my code.  I will work from the big picture down to the nitty gritty of the code. If you have questions or spot a mistake feel free to tweet me at <a href="https://twitter.com/Gwildridge">@Gwildridge</a>. A brief disclaimer that I am a highschool student and although the information on this page is correct to the best of my knowledge, I would not consider myself all-knowing on this material. </p>
+      <p>This is currently being revised and edited:</p>
+
+<p>This will be a comprehensive review of everything I have learned following <a href="http://cs231n.stanford.edu/">CS231n</a>along with a walk through of my code.  I will work from the big picture down to the nitty gritty of the code. If you have questions or spot a mistake feel free to tweet me at <a href="https://twitter.com/Gwildridge">@Gwildridge</a>. A brief disclaimer that I am a high school student and although the information on this page is correct to the best of my knowledge, I would not consider myself all-knowing on this material. For resources I used the <a href="http://cs231n.stanford.edu/syllabus.html">CS231n lectures and notes</a>. I was using the lectures until they were taken down. To get through parts of the assignment used a forum that was posted under one of the lectures; that I have been unable to find since the comments disappeared with the video. I am doing my best to locate the forum so I can properly cite it. I also got a lot of aid in my understanding from a professor from my school. </p>
 
 <h1>
 <a id="introduction" class="anchor" href="#introduction" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Introduction</h1>
@@ -123,7 +125,7 @@ num_classes = W.shape[1]
 num_train = X.shape[0]
 loss = 0.0
 for i in xrange(num_train):
-    scores = X[i].dot(W)
+    scores = X[i].dot(W) #linear classifier
     dT = np.zeros(W.shape)
     correct_class_score = scores[y[i]]
     gradCounter = 0
@@ -180,6 +182,53 @@ return loss, dW
 </code></pre>
 
 <h2>
+<a id="optimization" class="anchor" href="#optimization" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Optimization</h2>
+
+<p>Through using either the SVM or the Softmax classfier we can obtain the loss, the issue of incrementing or decrementing the weights must now be addressed. One method is to randomly increase and decrease the weights and use the weights that yield the smallest loss. Or, as this is  terrible method, we could follow the slope. </p>
+
+<h3>
+<a id="numerical-gradient" class="anchor" href="#numerical-gradient" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Numerical Gradient</h3>
+
+<p>Basically we could compute what we will come to call an analytic gradient by taking the slope in a bunch of directions through taking a series of tiny steps. Through this we are finding the gradient, or what direction is uphill, however we are trying to decrease our values so we will take the - of the gradient and take a small step down hill.   This method is effective but it is incredibly slow and computationally expensive… it is the reason people focused on feature detection for 50 years. Instead a technique called backpropagation can be used to expedite the process and make it much less computationally expensive. </p>
+
+<h3>
+<a id="analytic-gradient-backpropagation" class="anchor" href="#analytic-gradient-backpropagation" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Analytic Gradient: Backpropagation</h3>
+
+<p>To understand backpropagation you have to understand the chain rule with partial derivatives. After that it is rather straightforward as backpropagation is the recursive application of chain rule through a computational graph to find the influence of every intermediate value in the graph on the final loss function. Finding the effects that the inputs have on the output of the loss function.</p>
+
+<h3>
+<a id="stochastic-gradient-descent" class="anchor" href="#stochastic-gradient-descent" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Stochastic Gradient Descent</h3>
+
+<pre><code>def train(self, X, y, learning_rate=1e-3, reg=1e-5, num_iters=100, batch_size=200, verbose=False)
+    num_train, dim = X.shape
+    num_classes = np.max(y) + 1 # assume y takes values 0...K-1 where K is number of classes
+    if self.W is None:
+        # lazily initialize Ws
+        self.W = 0.001 * np.random.randn(dim, num_classes)
+    # Run stochastic gradient descent to optimize W
+    loss_history = []
+    for it in xrange(num_iters):
+         X_batch = None
+         y_batch = None
+
+        i = np.random.choice(num_train, batch_size,replace=True)
+        X_batch = X[i]
+        y_batch = y[i]
+
+    # evaluate loss and gradient
+    loss, grad = self.loss(X_batch, y_batch, reg)
+    loss_history.append(loss)
+
+    # perform parameter update
+    self.W += -learning_rate * grad
+
+    if verbose and it % 100 == 0:
+        print 'iteration %d / %d: loss %f' % (it, num_iters, loss)
+
+    return loss_history
+</code></pre>
+
+<h2>
 <a id="softmax-classifier" class="anchor" href="#softmax-classifier" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Softmax Classifier</h2>
 
 <p>Again using the scores outputted from the linear classifier given random weights, the softmax classifier interprets the scores as the unnormalized log probabilities of the classes (Andrej mentioned the reason behind this interpretation is very complex). So we first exponentiate the scores, normalize them and then take the -log to retrieve the probabilities of the classes. We then attempt to maximize the log likelihood and minimize the -log likelihood of the true class?</p>
@@ -227,15 +276,18 @@ return loss, dW
 </code></pre>
 
 <h2>
-<a id="optimization" class="anchor" href="#optimization" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Optimization</h2>
-
-<p>Through using either the SVM or the Softmax classfier we can obtain the loss, the issue of incrementing or decrementing the weights must now be addressed. One method is to randomly increase and decrease the weights and use the weights that yield the smallest loss. Or, as this is  terrible method, we could follow the slope. Basically we could compute what we will come to call an analytic gradient by taking the slope in a bunch of directions through taking a series of tiny steps. Through this we are finding the gradient, or what direction is uphill, however we are trying to decrease our values so we will take the - of the gradient and take a small step down hill.   This method is effective but it is incredibly slow and computationally expensive… it is the reason people focused on feature detection for 50 years. Instead a technique called backpropagation can be used to expedite the process and make it much less computationally expensive. </p>
+<a id="two-layer-neural-network" class="anchor" href="#two-layer-neural-network" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Two-Layer Neural Network</h2>
 
 <h3>
-<a id="backpropagation" class="anchor" href="#backpropagation" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Backpropagation</h3>
+<a id="forward-pass-and-computing-the-loss" class="anchor" href="#forward-pass-and-computing-the-loss" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Forward Pass and Computing the Loss</h3>
 
-<h2>
-<a id="two-layer-neural-network" class="anchor" href="#two-layer-neural-network" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Two-Layer Neural Network</h2>
+<pre><code>l1 = X.dot(W1) + b1.T
+l2 = relu(l1).dot(W2) + b2.T
+scores = l2
+</code></pre>
+
+<h3>
+<a id="backward-pass-computing-gradients" class="anchor" href="#backward-pass-computing-gradients" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Backward Pass (computing gradients)</h3>
 
 <h2>
 <a id="image-features" class="anchor" href="#image-features" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Image Features</h2>
