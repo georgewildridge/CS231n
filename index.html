@@ -21,7 +21,7 @@
     <section class="main-content">
       <p>This is currently being revised and edited:</p>
 
-<p>This will be a comprehensive review of everything I have learned following <a href="http://cs231n.stanford.edu/">CS231n</a>along with a walk through of my code.  I will work from the big picture down to the nitty gritty of the code. If you have questions or spot a mistake feel free to tweet me at <a href="https://twitter.com/Gwildridge">@Gwildridge</a>. A brief disclaimer that I am a high school student and although the information on this page is correct to the best of my knowledge, I would not consider myself all-knowing on this material. For resources I used the <a href="http://cs231n.stanford.edu/syllabus.html">CS231n lectures and notes</a>. I was using the lectures until they were taken down. To get through parts of the assignment used a forum that was posted under one of the lectures; that I have been unable to find since the comments disappeared with the video. I am doing my best to locate the forum so I can properly cite it. I also got a lot of aid in my understanding from a professor from my school. </p>
+<p>This will be a comprehensive review of everything I have learned following <a href="http://cs231n.stanford.edu/">CS231n</a>along with a walk through of my code.  I will work from the big picture down to the nitty gritty of the code. If you have questions or spot a mistake feel free to tweet me at <a href="https://twitter.com/Gwildridge">@Gwildridge</a>. A brief disclaimer that I am a high school student and although the information on this page is correct to the best of my knowledge, I would not consider myself all-knowing on this material. For resources I used the <a href="http://cs231n.stanford.edu/syllabus.html">CS231n lectures and notes</a>. I was using the lectures until they were taken down. To get through parts of the assignment used a forum that was posted under one of the lectures; that I have been unable to find since the comments disappeared with the video. I am doing my best to locate the forum so I can properly cite it. I also got a lot of aid in my understanding from a professor from my school.  For the majority of my work, my goal was to implement the function with loops and prove to myself I understand it. Now I also spent a huge amount of time trying to vectorize the equations; however, this step became exponentially harder for me as I have not taken linear algebra or multivariable calculus. Especially in the earlier cases, when after four or five hours of work I still felt no closer to knowing exactly what I was trying to do I would refer to my mythical lost resource for understanding. That said I still desired to understand and that is part of my motivation for creating this  blog post as I would like to express what I have learned in my own words which should help me reinforce the idea that I really do understand what I have been looking at. </p>
 
 <h1>
 <a id="introduction" class="anchor" href="#introduction" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Introduction</h1>
@@ -119,29 +119,24 @@ Where S is a vector of class scores and 1 represents the safety margin. The scor
 <h3>
 <a id="with-loops" class="anchor" href="#with-loops" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>With Loops:</h3>
 
-<pre><code>dW = np.zeros(W.shape) # initialize the gradient as zero
-# compute the loss and the gradient
-num_classes = W.shape[1]
-num_train = X.shape[0]
+<p>First off, I need to refer you to the <a href="http://cs231n.github.io/optimization-1/#analytic">course notes</a> as it goes through many aspects of this part of the assignment. Naturally it is a good idea to first start by implementing the SVM loss function at a single point. The equation for this looks like this:</p>
+
+<p>And the code would look like this:</p>
+
+<pre><code># compute the loss and the gradient
+num_classes = W.shape[1]  # how many classes
+num_train = X.shape[0] # how many images are in the training dataset
 loss = 0.0
 for i in xrange(num_train):
     scores = X[i].dot(W) #linear classifier
-    dT = np.zeros(W.shape)
+    dT = np.zeros(W.shape) # create an array the same size as the weight matrix made entirely out of zeros
     correct_class_score = scores[y[i]]
-    gradCounter = 0
     for j in xrange(num_classes):
-        if j == y[i]:
+        if j == y[i]: #importantly the loss is not calculated when you are comparing an image to itself as it would give a value of (delta) which would have a non universal affect on the overall loss. 
             continue
         margin = scores[j] - correct_class_score + 1 # note delta = 1
         if margin &gt; 0:
             loss += margin
-            gradCounter += 1
-            dT[:,j] = X[i] #change every column's number to that of the current picture
-    #to the column of the correct class we then add  the gradient
-    dT[:,y[i]] = -(gradCounter  * X[i])
-    dW += dT
-dW = (1/num_train)*dW + reg*W
-
 # Right now the loss is a sum over all training examples, but we want it
 # to be an average instead so we divide by num_train.
 loss /= num_train
@@ -149,18 +144,60 @@ loss /= num_train
 # Add regularization to the loss.
 loss += 0.5 * reg * np.sum(W * W)
 
+return loss
+</code></pre>
+
+<p>From here it is relatively simple to incorporate the gradient. As the course notes tell us the equation for the gradient of an SVM can be found by taking the gradient with respect to (wyi):</p>
+
+<p>It then goes on to tell us, and I quote, "when you’re implementing this in code you’d simply count the number of classes that didn’t meet the desired margin (and hence contributed to the loss function) and then the data vector (Xi) scaled by this number is the gradient".  So that is what we will do in the code:</p>
+
+<pre><code># compute the loss and the gradient
+num_classes = W.shape[1] 
+num_train = X.shape[0]
+loss = 0.0 
+for i in xrange(num_train):
+    scores = X[i].dot(W)
+    dW = np.zeros(W.shape) #initializing the gradient
+    correct_class_score = scores[y[i]]
+    gradCounter = 0
+    for j in xrange(num_classes):
+        if j == y[i]:
+            continue
+        margin = scores[j] - correct_class_score + 1 
+        if margin &gt; 0:
+            loss += margin
+            dW[:,j] = X[i] #updating the gradient for incorrect rows
+            gradCounter += 1
+
+
+#adding the gradient to the column of the correct class
+dW[:,y[i]] = -(gradCounter  * X[i])
+
+
+dW = reg*W + (dW/num_train) #regularize the weights
+
+# We want the loss to be an average of all the training examples so we divide by num_train
+loss = loss/num_train
+
+# Add regularization to the loss.
+loss += 0.5 * reg * np.sum(W * W)  
+
 return loss, dW
 </code></pre>
 
 <h3>
 <a id="vectorized" class="anchor" href="#vectorized" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Vectorized</h3>
 
+<p>Now for the hard part. Vectorizing the equations we just used above. This is one of those cases where I resorted to the forums for understanding after four or five hours.  Although I lost the forum, I did find a great resource when I searched for it on <a href="https://bruceoutdoors.wordpress.com/2016/05/06/cs231n-assignment-1-tutorial-q2-training-a-support-vector-machine/">this blog</a>. On a side note, in taking this course I also learned a heck of a lot about python and numpy. </p>
+
+<p>So I am going to start from the other way around this time, in the manner that I was forced to approach this problem:</p>
+
 <pre><code>loss = 0.0
 num_train = X.shape[0]
 num_classes = W.shape[1]
 dW = np.zeros(W.shape) # initialize the gradient as zero
 
-score = X.dot(W)
+score = X.dot(W) #linear classifier
 
 y_pred = score[range(score.shape[0]),y]
 print  score.shape[0]
@@ -291,6 +328,11 @@ scores = l2
 
 <h2>
 <a id="image-features" class="anchor" href="#image-features" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Image Features</h2>
+
+<h1>
+<a id="future-work" class="anchor" href="#future-work" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Future Work</h1>
+
+<p>When I reached this part of the course the lecture videos were taken down, as it took me an incredible amount of time to do this assignment with the lecture videos, my teacher and I decided to focus on a project or two that would both contribute to this course and prepare me for my summer internship. Here is a link to that repo and what exactly I finished my term with. However, I have not given up on this course, I still feel I have a tremendous amount to learn from it. But from my initial experience, I hope to revisit it some time next year after I have taken linear algebra and multivariable calculus so I am more capable of working through it independently. </p>
 
       <footer class="site-footer">
         <span class="site-footer-owner"><a href="https://github.com/georgewildridge/CS231n">CS231n</a> is maintained by <a href="https://github.com/georgewildridge">georgewildridge</a>.</span>
