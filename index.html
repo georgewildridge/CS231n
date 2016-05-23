@@ -48,11 +48,11 @@ The first approach to solving vision was edge detection and then moved into segm
 
 <p>This classifier literally compares an image for similarities to a dataset. After finding the most similar image/images in the dataset, it classifies the original image with the class of the similar image/images. By similar I am referring to the distances between the two images. Two different methods can be used to find the distance, the L1/Manhattan distance:</p>
 
-<p><img src="link" alt="Manhattan distance"></p>
+<p><img src="https://raw.githubusercontent.com/georgewildridge/CS231n/master/Website%20Pictures/manhattan.png" alt="Manhattan distance"></p>
 
 <p>And the L2/Euclidean distance:</p>
 
-<p><img src="link" alt="Euclidean Distance"></p>
+<p><img src="https://raw.githubusercontent.com/georgewildridge/CS231n/master/Website%20Pictures/euclidean.png" alt="Euclidean Distance"></p>
 
 <p>The image with the smallest distance between the two is considered to be the most similar image. This is called the nearest neighbor classifier. The K-nearest neighbor classifier is very similar as instead of selecting just one most similar images, it selects K most similar images and then classifies the image based off the class that has the majority in the K images. </p>
 
@@ -110,7 +110,7 @@ return dists
 
 <p>Although this is not a direct part of the assignment, it is necessary to understand what exactly the Support Vector Machine and the Softmax classifier are doing… so bear with me. A linear classifier involves an input (an image in this case) and a set of initially arbitrary parameters known as weights. Then we have some function. Here it is in its most basic form:</p>
 
-<p><img src="link" alt="linear classifier"></p>
+<p><img src="https://raw.githubusercontent.com/georgewildridge/CS231n/master/Website%20Pictures/linear.png" alt="linear classifier"></p>
 
 <p>Where x is the image's pixels (stretched into one column) and W is a one column matrix with as many rows as classes. When the two are multiplied together we get a score for each class. Basically we are computing a weighted sum of all the pixel values for each score. Ideally when we pass an image through, the correct classifier will have the lowest score; however, this is often not the case which is where the SVM and the softmax classifier come in. </p>
 
@@ -119,7 +119,7 @@ return dists
 
 <p>Using the output of a linear classifier given random weights, the intent of the SVM is to gauge the degree of how wrong the classification is. It does this by repeatedly finding the difference between the lowest score and the correct score for each image.  With the output we can identify how to change the linear classifiers weights in order so the linear classifier will improve in its next pass. That was a very high level overview, now to look at exactly what is happening:</p>
 
-<p><img src="link" alt="SVM"></p>
+<p><img src="https://raw.githubusercontent.com/georgewildridge/CS231n/master/Website%20Pictures/SVM.png" alt="SVM"></p>
 
 <p>Where S is a vector of class scores and 1 represents the safety margin. The scores are scale free and selected randomly. The max is taken in order to clamp possible loss at zero so negative numbers will not have a bearing on the overall loss of the function. If negative loss was allowed to pass through, it would decrease the overall loss which can distort the overall loss and make it seem like we are closer to identifying the correct scores even if we aren't. </p>
 
@@ -270,15 +270,15 @@ return loss, dW
 
 <p>Again using the scores outputted from the linear classifier given random weights, the softmax classifier interprets the scores as the unnormalized log probabilities of the classes (Andrej mentioned the reason behind this interpretation is very complex). So we first exponentiate the scores, normalize them and then take the -log to retrieve the probabilities of the classes. We then attempt to maximize the log likelihood and minimize the -log likelihood of the true class. Two sets of course notes that were really helpful to me when I implemented this can be found <a href="http://cs231n.github.io/neural-networks-case-study/">here</a> and <a href="http://cs231n.github.io/linear-classify/">here</a>. Here is an equation for what I just described.</p>
 
-<p><img src="link" alt="softmax"></p>
+<p><img src="https://raw.githubusercontent.com/georgewildridge/CS231n/master/Website%20Pictures/softmax.png" alt="softmax"></p>
 
-<p>The gradient of which would be:  **publish proof</p>
+<p>The gradient of which would be: </p>
 
-<p><img src="link" alt="gradient"></p>
+<p><img src="https://raw.githubusercontent.com/georgewildridge/CS231n/master/Website%20Pictures/softmaxgradient.png" alt="gradient"></p>
 
 <p>The notes also emphasize a point on ensuring numerical stability as we could potentially be dealing with large numbers. They suggest we implement an equation like this:</p>
 
-<p><img src="link" alt="Numerical Stability"></p>
+<p><img src="https://github.com/georgewildridge/CS231n/blob/master/Website%20Pictures/numericalStability.png" alt="Numerical Stability"></p>
 
 <p>Here is the implementation with loops:</p>
 
@@ -325,15 +325,15 @@ return loss, dW
 
 <p>Looking at the equation of a neural network is probobly the best way to understand what exactly it is. Here's an equation for a 3 layer Neural Network:</p>
 
-<p><img src="link" alt="3 layer"></p>
+<p><img src="https://raw.githubusercontent.com/georgewildridge/CS231n/master/Website%20Pictures/theelayer.png" alt="3 layer"></p>
 
 <p>Now a two layer:</p>
 
-<p><img src="link" alt="2 layer"></p>
+<p><img src="https://raw.githubusercontent.com/georgewildridge/CS231n/master/Website%20Pictures/twolayer.png" alt="2 layer"></p>
 
 <p>Finally a linear classifier:</p>
 
-<p><img src="link" alt="Linear classifier"></p>
+<p><img src="https://raw.githubusercontent.com/georgewildridge/CS231n/master/Website%20Pictures/linear.png" alt="Linear classifier"></p>
 
 <p>It is just a matter of embedding linear classifiers within eachother, allowing for multiple sets of weights which means more detail about the image. In this part of the assignment we are asked to implement a two layer neural network. </p>
 
@@ -362,15 +362,15 @@ scores = np.dot(layer2,W2) + b2
 <p>The backward pass was more challenging; however, I was able to figure It out using the course notes on <a href="http://cs231n.github.io/optimization-2/">optimization</a> and <a href="http://cs231n.github.io/neural-networks-case-study/">neural networks</a>. 
 If the ReLU layer just equals:</p>
 
-<p>!(<a href="link">relu</a></p>
+<p>!(<a href="https://raw.githubusercontent.com/georgewildridge/CS231n/master/Website%20Pictures/relu.png">relu</a></p>
 
 <p>Then its gradient is:</p>
 
-<p><img src="link" alt="relugradient"></p>
+<p><img src="https://raw.githubusercontent.com/georgewildridge/CS231n/master/Website%20Pictures/relugradient.png" alt="relugradient"></p>
 
 <p>As the first layer is just the softmax function again its gradient is:</p>
 
-<p>![</p>
+<p><img src="https://raw.githubusercontent.com/georgewildridge/CS231n/master/Website%20Pictures/softmaxgradient.png" alt="softmaxgradient"></p>
 
 <p>Finally this step also calls for backpropagation, which is just the application of the chain rule:</p>
 
