@@ -112,25 +112,24 @@ return dists
 
 <p><img src="https://raw.githubusercontent.com/georgewildridge/CS231n/master/Website%20Pictures/linear.png" alt="linear classifier"></p>
 
-<p>Where x is the image's pixels (stretched into one column) and W is a one column matrix with as many rows as classes. When the two are multiplied together we get a score for each class. Basically we are computing a weighted sum of all the pixel values for each score. Ideally when we pass an image through, the correct classifier will have the lowest score; however, this is often not the case which is where the SVM and the softmax classifier come in. </p>
+<p>Where x is the image's pixels (stretched into one column) and W is a one column matrix with as many rows as classes. When the two are multiplied together we get a score for each class. Basically we are computing a weighted sum of all the pixel values for each score. Ideally when we pass an image through, the correct classifier will have the lowest score; however, this is often not the case which is where the SVM and the softmax classifier come in. It is important to note that the scores will be score free, and when first training a linear classifier, selected at random. </p>
 
 <h2>
 <a id="support-vector-machine" class="anchor" href="#support-vector-machine" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Support Vector Machine</h2>
 
-<p>Using the output of a linear classifier given random weights, the intent of the SVM is to gauge the degree of how wrong the classification is. It does this by repeatedly finding the difference between the lowest score and the correct score for each image.  With the output we can identify how to change the linear classifiers weights in order so the linear classifier will improve in its next pass. That was a very high level overview, now to look at exactly what is happening:</p>
+<p>Using the output of a linear classifier given random weights, the intent of the SVM is to gauge the degree of how wrong the classification is. It does this by repeatedly finding the difference between the lowest score and the correct score for each image.  With the output we can identify how to change the linear classifiers weights in order to improve classification on its next pass. That was a very high level overview, now to look at exactly what is happening:</p>
 
 <p><img src="https://raw.githubusercontent.com/georgewildridge/CS231n/master/Website%20Pictures/SVM.png" alt="SVM"></p>
 
-<p>Where S is a vector of class scores and 1 represents the safety margin. The scores are scale free and selected randomly. The max is taken in order to clamp possible loss at zero so negative numbers will not have a bearing on the overall loss of the function. If negative loss was allowed to pass through, it would decrease the overall loss which can distort the overall loss and make it seem like we are closer to identifying the correct scores even if we aren't. </p>
+<p>Where x is a vector of images, w is a vector of weights, y is a vector of labels and delta represents the safety margin. 
+The max is taken in order to clamp possible loss at zero so negative numbers will not have a bearing on the overall loss of the function. If negative loss was allowed to pass through, it would decrease the overall loss which can distort the overall loss and make it seem like we are closer to identifying the correct scores even if we aren't. </p>
 
 <p>In this part of the assignment we first compute the loss and the gradient with loops before implementing a vectorized version.</p>
 
 <h3>
 <a id="with-loops" class="anchor" href="#with-loops" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>With Loops:</h3>
 
-<p>First off, I need to refer you to the <a href="http://cs231n.github.io/optimization-1/#analytic">course notes</a> as it goes through many aspects of this part of the assignment. Naturally it is a good idea to first start by implementing the SVM loss function at a single point. </p>
-
-<p>And the code would look like this:</p>
+<p>First off, I need to refer you to the <a href="http://cs231n.github.io/optimization-1/#analytic">course notes</a> as it goes through many aspects of this part of the assignment. Naturally it is a good idea to start by implementing the SVM loss function:</p>
 
 <pre><code># compute the loss and the gradient
 num_classes = W.shape[1]  # how many classes
@@ -156,7 +155,7 @@ loss += 0.5 * reg * np.sum(W * W)
 return loss
 </code></pre>
 
-<p>From here it is relatively simple to incorporate the gradient. As the course notes tell us the equation for the gradient of an SVM can be found by taking the gradient with respect to (wyi):</p>
+<p>Now to include the gradient. As the course notes tell us the equation for the gradient of an SVM can be found by taking the gradient with respect to (wyi):</p>
 
 <p><img src="https://raw.githubusercontent.com/georgewildridge/CS231n/master/Website%20Pictures/SVMgradient.png" alt="gradient"></p>
 
@@ -199,24 +198,21 @@ return loss, dW
 <h3>
 <a id="vectorized" class="anchor" href="#vectorized" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Vectorized</h3>
 
-<p>Now for the hard part. Vectorizing the equations we just used above. This is one of those cases where I resorted to the forums for understanding after four or five hours.  Although I lost the forum, I did find a great resource when I searched for it on <a href="https://bruceoutdoors.wordpress.com/2016/05/06/cs231n-assignment-1-tutorial-q2-training-a-support-vector-machine/">this blog</a>. On a side note, in taking this course I also learned a heck of a lot about python and numpy. </p>
+<p>Now for the hard part: vectorizing the equations we just used above. This is one of those cases where I resorted to <a href="http://networkflow.net/forum/19-stanford-cs231n-convolutional-neural-networks-for-visual-recognition/">the forum</a> for understanding after four or five hours of unsuccessful attempts. To be as clear as possible, this is not my code.  Although I have partial explanations in the comments, when I have time I plan on putting matrices next to this code for each step to show exactly what is happening. 
+    loss = 0.0
+    num_train = X.shape[0]
+    num_classes = W.shape[1]
+    dW = np.zeros(W.shape) # initialize the gradient as zero</p>
 
-<p>So I am going to start from the other way around this time, in the manner that I was forced to approach this problem. My explanation will be in the form of comments next to each line of code addressing what that line of code is doing. </p>
-
-<pre><code>loss = 0.0
-num_train = X.shape[0]
-num_classes = W.shape[1]
-dW = np.zeros(W.shape) # initialize the gradient as zero
-
-
-#Vectorized version of the SVM loss
+<pre><code>#Vectorized version of the SVM loss
 score = X.dot(W) #linear classifier
 
-y_pred = score[range(score.shape[0]),y] 
+y_pred = score[range(score.shape[0]),y]  
+
+#SVM loss
 margins = score - y_pred[:,None] + 1
 margins[range(score.shape[0]),y] = 0
 margins = np.maximum(np.zeros(margins.shape),margins)
-
 loss = np.sum(margins) 
 loss /= num_train #average loss
 loss += 0.5 * reg * np.sum(W*W) #regularization
@@ -233,36 +229,37 @@ return loss, dW
 <h2>
 <a id="optimization" class="anchor" href="#optimization" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Optimization</h2>
 
-<p>Through using either the SVM or the Softmax classfier we can obtain the loss, the issue of incrementing or decrementing the weights must now be addressed. One method is to randomly increase and decrease the weights and use the weights that yield the smallest loss. Or, as this is  terrible method, we could follow the slope. </p>
+<p>Through using either the SVM or the Softmax classifier (which I will address later) we can obtain the loss; however, we lack a way of improving the classifier. One method is to randomly increase and decrease the weights and use the weights that yield the smallest loss. Or, as this is  terrible method, we could follow the slope. </p>
 
 <h3>
 <a id="numerical-gradient" class="anchor" href="#numerical-gradient" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Numerical Gradient</h3>
 
-<p>Basically we could compute what we will come toF call an analytic gradient by taking the slope in a bunch of directions through taking a series of tiny steps. Through this we are finding the gradient, or what direction is uphill, however we are trying to decrease our values so we will take the - of the gradient and take a small step down hill.   This method is effective but it is incredibly slow and computationally expensive… it is the reason people focused on feature detection for 50 years. Instead a technique called backpropagation can be used to expedite the process and make it much less computationally expensive. However, the Numerical gradient is still utilized as the analytic gradient is not as reliable as the numerical gradient, so (gradient checks) are performed on the analytic gradient with the numerical gradient. </p>
+<p>The numerical gradient is found by taking the slope in a bunch of different directions. Through this we are finding the gradient, or what direction is uphill, however we are trying to decrease our values so we will take the negative of the gradient and take a small step down hill.  This method is effective but it is incredibly slow and computationally expensive… it is the reason people focused on feature detection for 50 years. Instead we will predominately use a technique called backpropagation which is much less computationally expensive. However, the numerical gradient is still utilized to perform gradient checks on backpropagation as it is much more reliable.  </p>
 
 <h3>
 <a id="analytic-gradient-backpropagation" class="anchor" href="#analytic-gradient-backpropagation" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Analytic Gradient: Backpropagation</h3>
 
-<p>To understand backpropagation you have to understand the chain rule with partial derivatives. After that it is rather straightforward as backpropagation is the recursive application of chain rule through a computational graph to find the influence of every intermediate value in the graph on the final loss function. Finding the effects that the inputs have on the output of the loss function.</p>
+<p>To understand backpropagation you have to understand the chain rule with partial derivatives. After that it is rather straightforward as backpropagation is the recursive application of chain rule through a computational graph to find the influence of every intermediate value in the graph on the final loss function. This enables you to find the effects that the inputs have on the output of the loss function. There is an entire section of the <a href="http://cs231n.github.io/optimization-1/">course notes</a> which explains this.</p>
 
 <h3>
 <a id="stochastic-gradient-descent" class="anchor" href="#stochastic-gradient-descent" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Stochastic Gradient Descent</h3>
 
-<p>In the SVM part of the assignment, they also ask us to write a few lines of code in the linear classifier file to implement stochastic gradient descent. First they ask us to sample some batch_size elements from the training data and the corresponding labels. Further they give us a hint to use the np.random.choice function to generate indices. With all this in mind, it becomes pretty easy to do this part.</p>
+<p>In the SVM part of the assignment, they also ask us to write a few lines of code in the linear classifier file to implement stochastic gradient descent. The course notes inform us that stochastic gradient descent explicitly refers to doing gradient descent (changing the values of the weights in an effort to improve classification accuracy) with only one example. However, stochastic gradient descent is often used to refer to mini-batch gradient descent as well, which trains on multiple examples. Technically we are implementing mini-batch gradient descent here. 
+First they ask us to sample some batch size elements from the training data and the corresponding labels. Further they give us a hint to use the np.random.choice function to generate indices. With all this in mind, it becomes pretty he to do this part.</p>
 
 <pre><code> z = np.random.choice(num_train, batch_size,replace=True) # take a random batch, size batch_size, from the array num_train
  X_batch = X[z] # retrieve the images and their values
  y_batch = y[z]
 </code></pre>
 
-<p>Next they ask us to update the weights using the gradient and the learning rate. We have already done something very similar to this in the SVM implemenation:</p>
+<p>Next they ask us to update the weights using the gradient and the learning rate. The learning rate is just another word for step size, this variable adjusts how quickly we are attempting to optimize. We have already done something very similar to this in the SVM implementation:</p>
 
 <pre><code>self.W += -learning_rate * grad
 </code></pre>
 
 <p>Finally they ask us to implement the predict method to predict the labels for the data points:</p>
 
-<pre><code>y_pred = np.argmax(X.dot(self.W), axis=1) #returns the indices of the maximum value of the interior function, which, if you are observant, you realized was just the linear classifier to predict the scores.
+<pre><code>y_pred = np.argmax(X.dot(self.W), axis=1) #returns the indices of the maximum value of the interior function, which is just the linear classifier. 
 </code></pre>
 
 <h2>
@@ -306,16 +303,20 @@ return loss, dW
 </code></pre>
 
 <p>###Vectorized
-Again I struggled for hours trying to figure out how to do this myself before resorting to that resource I could not find (but am diligently looking for!). Although I drew my understanding and implementation from that forum, as I could not find it I will refer you to <a href="https://bruceoutdoors.wordpress.com/2016/04/30/cs231n-assignment-1-tutorial-q3-implement-a-softmax-classifier/">this blog</a> which goes over similar concepts. If it is at all unclear, this is not my code; however, I did spend a great deal of time endeavoring to understand the motivation behind every line. 
+Again I struggled for hours trying to figure out how to do this myself before resorting to the <a href="http://networkflow.net/forum/19-stanford-cs231n-convolutional-neural-networks-for-visual-recognition/">forum</a>. If it is at all unclear, this is not my code; however, I did spend a great deal of time endeavoring to understand the motivation behind every line. Although I have partial explanations in the comments, when I have time I plan on putting matrices next to this code for each step to show exactly what is happening. 
     scores = X.dot(W) # linear classifer
-    scores -= np.max(scores,axis=1).reshape(num_train,1)
-    prob = np.exp(scores)/np.reshape(np.sum(np.exp(scores),axis=1),(num_train,1))
-    loss = -np.sum(np.log(P[(range(num_train),y)]))
-    loss /= num_train
-    loss += 0.5 * reg * np.sum(W * W)</p>
+    scores -= np.max(scores,axis=1).reshape(num_train,1)  </p>
 
-<pre><code>prob[(range(num_train),y)] = prob[(range(num_train),y)] - 1
-dW = (1.0/num_train) * np.dot(X.T,P) + reg * W
+<pre><code>#softmax with numerical stability
+prob = np.exp(scores)/np.reshape(np.sum(np.exp(scores),axis=1),(num_train,1)
+loss = -np.sum(np.log(prob[(range(num_train),y)])) 
+loss /= num_train
+#final loss with weight regularization
+loss += 0.5 * reg * np.sum(W * W)
+
+#calculating the gradient w/ weight regularization
+prob[(range(num_train),y)] = prob[(range(num_train),y)] - 1
+dW = (1.0/num_train) * np.dot(X.T,prob) + reg * W
 
 return loss, dW
 </code></pre>
@@ -335,7 +336,7 @@ return loss, dW
 
 <p><img src="https://raw.githubusercontent.com/georgewildridge/CS231n/master/Website%20Pictures/linear.png" alt="Linear classifier"></p>
 
-<p>It is just a matter of embedding linear classifiers within eachother, allowing for multiple sets of weights which means more detail about the image. In this part of the assignment we are asked to implement a two layer neural network. </p>
+<p>It is just a matter of embedding linear classifiers within each other, allowing for multiple sets of weights which means more detail about the image. In this part of the assignment we are asked to implement a two layer neural network. </p>
 
 <h3>
 <a id="forward-pass-and-computing-the-loss" class="anchor" href="#forward-pass-and-computing-the-loss" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Forward Pass and Computing the Loss</h3>
@@ -347,14 +348,16 @@ layer2 = np.maximum(0,layer1)
 scores = np.dot(layer2,W2) + b2
 </code></pre>
 
-<p>This is just the soft max loss with some minor adjustments as we are dealing with two sets of weights. Notably the hidden layer uses a "ReLU" non-linearity. This is function just means to take the maximum of 0 and x.
-    #softmax loss
-    scores -= np.max(scores,axis=1)[:,np.newaxis]
-    prob = np.exp(scores)/np.sum(np.exp(scores),axis=1)[:,np.newaxis]
-    loss = -np.sum(np.log(prob[(xrange(N),y)]))
-    loss /= N
-    loss += 0.5 * reg * np.sum(W1 * W1)
-    loss += 0.5 * reg * np.sum(W2 * W2)</p>
+<p>This is just the soft max loss with some minor adjustments as we are dealing with two sets of weights. Notably the hidden layer uses a "ReLU" non-linearity. This is function just means to take the maximum of 0 and x.</p>
+
+<pre><code>#softmax loss
+scores -= np.max(scores,axis=1)[:,np.newaxis]
+prob = np.exp(scores)/np.sum(np.exp(scores),axis=1)[:,np.newaxis]
+loss = -np.sum(np.log(prob[(xrange(N),y)]))
+loss /= N
+loss += 0.5 * reg * np.sum(W1 * W1)
+loss += 0.5 * reg * np.sum(W2 * W2)
+</code></pre>
 
 <h3>
 <a id="backward-pass-computing-gradients" class="anchor" href="#backward-pass-computing-gradients" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Backward Pass (computing gradients)</h3>
@@ -362,7 +365,7 @@ scores = np.dot(layer2,W2) + b2
 <p>The backward pass was more challenging; however, I was able to figure It out using the course notes on <a href="http://cs231n.github.io/optimization-2/">optimization</a> and <a href="http://cs231n.github.io/neural-networks-case-study/">neural networks</a>. 
 If the ReLU layer just equals:</p>
 
-<p>!(<a href="https://raw.githubusercontent.com/georgewildridge/CS231n/master/Website%20Pictures/relu.png">relu</a></p>
+<p><img src="https://raw.githubusercontent.com/georgewildridge/CS231n/master/Website%20Pictures/relu.png" alt="relu"></p>
 
 <p>Then its gradient is:</p>
 
@@ -392,7 +395,7 @@ grads['b1'] = np.sum(dscores1, axis = 0)
 <h1>
 <a id="future-work" class="anchor" href="#future-work" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Future Work</h1>
 
-<p>When I reached this part of the course the lecture videos were taken down, as it took me an incredible amount of time to do this assignment with the lecture videos, my teacher and I decided to focus on a project or two that would both contribute to this course and prepare me for my summer internship. Here is a link to that repo and what exactly I finished my term with. However, I have not given up on this course, I still feel I have a tremendous amount to learn from it. But from my initial experience, I hope to revisit it sometime next year after I have taken linear algebra and multivariable calculus so I am more capable of working through it independently. </p>
+<p>When I reached this part of the course the lecture videos were taken down, as it took me an incredible amount of time to do this assignment with the lecture videos, my teacher and I decided to focus on learning to work with deep learning libraries like torch as it will enable me to use deep learning for more practical applications. Here is a link to that repo and what exactly I finished my term with. However, I have not given up on this course, I still feel I have a tremendous amount to learn from it. But from my initial experience, I hope to revisit it sometime next year after I have taken linear algebra and multivariable calculus so I am more capable of working through it independently. </p>
 
       <footer class="site-footer">
         <span class="site-footer-owner"><a href="https://github.com/georgewildridge/CS231n">CS231n</a> is maintained by <a href="https://github.com/georgewildridge">georgewildridge</a>.</span>
