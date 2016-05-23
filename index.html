@@ -21,7 +21,8 @@
     <section class="main-content">
       <p>This is currently being revised and edited:</p>
 
-<p>This will be a comprehensive review of everything I have learned following <a href="http://cs231n.stanford.edu/">CS231n</a>along with a walk through of my code.  I will work from the big picture down to the nitty gritty of the code. If you have questions or spot a mistake feel free to tweet me at <a href="https://twitter.com/Gwildridge">@Gwildridge</a>. A brief disclaimer that I am a high school student and although the information on this page is correct to the best of my knowledge, I would not consider myself all-knowing on this material. For resources I used the <a href="http://cs231n.stanford.edu/syllabus.html">CS231n lectures and notes</a>. I was using the lectures until they were taken down. To get through parts of the assignment I used <a href="http://networkflow.net/forum/19-stanford-cs231n-convolutional-neural-networks-for-visual-recognition/">this forum</a>. I also got a lot of aid in my understanding from a professor from my school.  For the majority of my work, my goal was to implement the function with loops and prove to myself I understand it. Now I also spent a huge amount of time trying to vectorize the equations; however, this step became exponentially harder for me as I have not taken linear algebra or multivariable calculus. Especially in the earlier cases, when after four or five hours of work I still felt no closer to knowing exactly what I was trying to do I would refer to my mythical lost resource for understanding. That said I still desired to understand and that is part of my motivation for creating this  blog post as I would like to express what I have learned in my own words which should help me reinforce the idea that I really do understand what I have been looking at. </p>
+<p>This will be a comprehensive review of everything I have learned following <a href="http://cs231n.stanford.edu/">CS231n</a>and completing assignment 1.  If you have questions or spot a mistake feel free to tweet me at <a href="https://twitter.com/Gwildridge">@Gwildridge</a>. For resources I used the <a href="http://cs231n.stanford.edu/syllabus.html">CS231n lectures and notes</a> (until the lectures were taken down) and I occasionally used <a href="http://networkflow.net/forum/19-stanford-cs231n-convolutional-neural-networks-for-visual-recognition/">this forum</a>. I was also assisted by a professor from my school who helped walk me through some of the more complex topics.
+My goal in completing this assignment was to understand the concepts behind neural networks. I was able to implement a lot of the code myself with the aid of the course notes but I did have to resort to the forum in the beginning when it came to code vectorization as I just did not understand what was being asked… this is most likely because I have neither taken linear algebra or multi-variable calculus. Even still this was only after four or five hours of work. Nevertheless, as I came into contact with more and more vectorized code and began internalizing what exactly was going on I was able to become more independent as time progressed. That said I still desire to understand the code I received help with and that is in part the motivation behind this article… to prove to myself I truly do understand it.</p>
 
 <h1>
 <a id="introduction" class="anchor" href="#introduction" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Introduction</h1>
@@ -29,34 +30,38 @@
 <h2>
 <a id="computer-vision" class="anchor" href="#computer-vision" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Computer Vision</h2>
 
-<p>Computer vision is the problem that Deep Learning is attempting to solve and I am attempting to learn about. The approach to understanding this has also been an approach to understanding human vision. Over the past fifty years, our understanding of human vision has been widdled down from a holistic approach where some part of our brain stores what a chair looks like to a hierarchical understanding. Hierarchical vision revolves around the understanding that our brain sees edges and that these edges define the shape. So instead of storing a chair somewhere in our brains we store a set of edges and lines that make up a chair and our brain knows which objects are which upon recognition. The overarching goal is to build a 3d model of objects within the computer. 
-The first approach to solving vision was edge detection nad then moved into segmentation for feature detection. For almost sixty years, people attempted to solve vision using this method… until very recently when deep leaning began being used. Now this isn't to say that Deep Learning hadn't existed until recently, it is to say that very few focused on it as a solution because it was too computationally costly. As of 2010 deep learning was a gain popularized. </p>
+<p>One particularly relevant application of deep learning and neural networks to this course is computer vision. Understanding how to give computers the benefit of site has been a key goal in the computer science community that came about in the very early days of vision. As researchers found, understanding computer vision is as much about understanding computers as it is about understanding human vision as that is inevitably what is trying to be replicated. Over the past fifty years, our understanding of human vision has shifted from a holistic approach to an hierarchical approach. Previously it was thought that the brain would store whole objects in a very specific part of the brain, now, with the hierarchical approach, it is believed that vision can be broken down into much smaller components then objects. Edges, for instance, are believed to define shapes so instead of storing an object somewhere in our brains we store a set of edges and lines that make up that object and only upon the triggering of those very specific edges and lines do we understand what an object is. With these specific edges and lines, humans are able to build complex 3d representations of objects within our head, which allows us to understand what objects are no matter their orientation, color, etc.  The overarching goal is to build this 3d model of objects within the computer. 
+The first approach to solving vision was edge detection and then moved into segmentation for feature detection. An example of this would be detecting for specific shapes in an image, say the straight legs of a chair a certain distance apart. For almost sixty years, people attempted unsuccessfully to solve vision using this method. Now focus has shifted to deep learning as it has achieved promising results over the past couple years in the field of machine learning. This isn't to say that Deep Learning hadn't existed until recently, as the first neural networks were built in the 60's, but it is to say that very few focused on it as a solution because it was just too slow and computationally costly.</p>
 
 <h2>
 <a id="image-classification" class="anchor" href="#image-classification" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Image Classification</h2>
 
-<p>Image classification is taking an image and transform it into one of a fixed number of categories. Vision is challenging because of a number of environment variables like rotation, point of view, illumination, deformation, occlusion, background clutter and finally interclass variation. There are two approaches, the explicit approach and the data driven approach. An example of the explicit approach is the feature detection, or the association of certain characteristics with certain objects. The issue with this approach is that every time you want to classify a new object a new algorithm must be hard coded to look for those characteristics, making this method incapable of major growth. Instead, a data driven has been taken with deep learning. This involves collecting a very large dataset of images and labels. Then machine learning is used to train and image classifier on the data prior to evaluating the classifier on the test images. It is this classifier I will address next. </p>
+<p>Image classification means taking an image and transforming it into one of a fixed number of categories. This is easier said than done because of a number of environment variables like rotation, point of view, illumination, deformation, occlusion, background clutter and interclass variation. Over the past sixty years two approaches have been taken: the explicit approach and the data driven approach. An example of an explicit approach is feature detection (the search for two straight lines a certain distance from each other to classify a chair). The issue with this approach is that every time you want to classify a new object a new algorithm must be hard coded to look for certain characteristics, making this method incapable of major growth. Deep learning follows the latter approach, which involves collecting a very large dataset of images and labels and then training algorithms using machine learning. </p>
 
 <h1>
 <a id="assignment-1" class="anchor" href="#assignment-1" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Assignment 1</h1>
 
-<p>In this assignment I will implement the k-nearest neighbor classifier, a support vector machine, the softmax classifier, backpropagation, a neural net and generate some features. </p>
+<p>In this assignment I will implement the k-nearest neighbor classifier, a support vector machine, the softmax classifier, backpropagation (stochastic gradient descent) and a neural net. </p>
 
 <h2>
 <a id="k-nearest-neighbor-classifier" class="anchor" href="#k-nearest-neighbor-classifier" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>K-Nearest Neighbor Classifier</h2>
 
-<p>This classifier works by comparing an image for similarities to ever other image in the dataset, and is classified based of the image(s)' class that it is most similar to. By similar I am refering to the the distance's between the two images. Two different methods can be used to find the distance, the L1/Manhattan distance:
-<img src="link" alt="Manhattan distance">
-And the L2/Euclidean distance:
-<img src="link" alt="Euclidean Distance">
-The image with the smallest distance between the two is considered to be the most similar image. However, what I just described was the nearest neighbor classifier. The K-nearest neighbor classifier is very similar. Instead of just stating the image with the smallest number is the most similar, K of the most similar images are retrieved before selecting the class that the majority of the K images have. </p>
+<p>This classifier literally compares an image for similarities to a dataset. After finding the most similar image/images in the dataset, it classifies the original image with the class of the similar image/images. By similar I am referring to the distances between the two images. Two different methods can be used to find the distance, the L1/Manhattan distance:</p>
 
-<p>In this particular assignment we were asked to implement this classifier using the Euclidean/L2 distance in three different ways: with two for loops, with one for loop and with no for loops. This is designed to introduce us to running loops in C instead of python.</p>
+<p><img src="link" alt="Manhattan distance"></p>
+
+<p>And the L2/Euclidean distance:</p>
+
+<p><img src="link" alt="Euclidean Distance"></p>
+
+<p>The image with the smallest distance between the two is considered to be the most similar image. This is called the nearest neighbor classifier. The K-nearest neighbor classifier is very similar as instead of selecting just one most similar images, it selects K most similar images and then classifies the image based off the class that has the majority in the K images. </p>
+
+<p>In this particular assignment we were asked to implement this classifier using the Euclidean/L2 distance in three different ways: with two for loops, with one for loop and with no for loops. This is designed to introduce us to vectorizing code. </p>
 
 <h3>
 <a id="two-loops" class="anchor" href="#two-loops" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Two Loops</h3>
 
-<p>Converting the equation into numpy operations:</p>
+<p>First I just convert the equation for Euclidean distance into numpy operation:</p>
 
 <pre><code>num_test = X.shape[0]
 num_train = self.X_train.shape[0]
@@ -72,19 +77,19 @@ return dists
 <h3>
 <a id="one-loop" class="anchor" href="#one-loop" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>One Loop</h3>
 
-<p>Reducing the same operation to one loop</p>
+<p>Reducing the same operation to one loop:</p>
 
 <pre><code>for i in xrange(num_test):
     dists[i,:] = np.sqrt(np.sum(np.square(X[i,:]-self.X_train),axis =1))
 return dists
 </code></pre>
 
-<p>The important thing to understand in this case is what exactly something like dists[i,:] is doing. From playing around with it and from the <a href="http://cs231n.github.io/python-numpy-tutorial/">python tutorial</a>, I figured out that his would represent every column in row i. So basically I am saying that every column in row i of dists is equal to the Euclidean distance of every column of row i minus every image in the dataset. </p>
+<p>The important thing to understand in this case is what exactly something like dists[i,:] is doing. From playing around with it and from the <a href="http://cs231n.github.io/python-numpy-tutorial/">python tutorial</a>, I figured out that his would represent every column in row i. It is just a more efficient way to compare every picture to the dataset. </p>
 
 <h3>
 <a id="no-loops" class="anchor" href="#no-loops" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>No Loops</h3>
 
-<p>Now we take it a step further, computing the euclidean distance without loops:</p>
+<p>Now we take it a step further, computing the Euclidean distance without loops:</p>
 
 <pre><code>dists = np.sqrt((X**2).sum(axis=1)[:, np.newaxis] + (self.X_train**2).sum(axis=1) - 2 * X.dot(self.X_train.T))
 return dists
@@ -98,29 +103,32 @@ return dists
 
 <p><img src="https://upload.wikimedia.org/math/a/8/3/a8394d4ad1d858186f89be9c590a3ac8.png" alt="rewritten Euclidean length of distance vector"></p>
 
-<p>Alright, now that we understand how to find the length of the two vector's distance vector, the same process is applied to the bigger matrices and that’s it. </p>
+<p>Alright, now that we understand how to find the length of the two vector's distance vector, the same process is applied to the bigger matrices.</p>
 
 <h2>
 <a id="linear-classifier" class="anchor" href="#linear-classifier" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Linear Classifier</h2>
 
-<p>Although this is not a direct part of the assignment, it is necessary to understand what exactly the Support Vector Machine and the Softmax classifer are doing… so bear with me. A linear classifier involves an input (an image in this case) and a set of initially arbitrary parameters known as weights. Then we have some function. Here it is in its most basic form:
-<img src="link" alt="linear classifier">
-Where x is the image's pixels (stretched into one column) and W is a one column matrix with as many rows as classes. When the two are multiplied together we get a score for each class. Basically we are computing a weighted sum of all the pixel values for each score. Ideally when we pass an image through, the correct classifier will have the lowest score; however, this is often not the case which is where the SVM and the softmax classifer come in. </p>
+<p>Although this is not a direct part of the assignment, it is necessary to understand what exactly the Support Vector Machine and the Softmax classifier are doing… so bear with me. A linear classifier involves an input (an image in this case) and a set of initially arbitrary parameters known as weights. Then we have some function. Here it is in its most basic form:</p>
+
+<p><img src="link" alt="linear classifier"></p>
+
+<p>Where x is the image's pixels (stretched into one column) and W is a one column matrix with as many rows as classes. When the two are multiplied together we get a score for each class. Basically we are computing a weighted sum of all the pixel values for each score. Ideally when we pass an image through, the correct classifier will have the lowest score; however, this is often not the case which is where the SVM and the softmax classifier come in. </p>
 
 <h2>
 <a id="support-vector-machine" class="anchor" href="#support-vector-machine" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Support Vector Machine</h2>
 
-<p>Using the output of a linear classifier given random weights, the intent of the SVM is to gauge  the degree of how wrong the classification is. It does this by repeatedly finding the difference between the lowest score and the correct score for each image.  With the output we can identify how to change the linear classifiers weights in order so the linear classifier will improve in its next pass. That was a very high level overview, now to look at exactly what is happening:
-<img src="link" alt="SVM">
-Where S is a vector of class scores and 1 represents the safety margin. The scores are scale free and selected randomly. The max is taken in order to clamp possible loss at zero so negative numbers will not have a bearing on the overall loss of the function. If negative loss was allowed to pass through, it would decrease the overall loss which can distort the overall loss and make it seem like we are closer to identifying the correct scores even if we aren't. </p>
+<p>Using the output of a linear classifier given random weights, the intent of the SVM is to gauge the degree of how wrong the classification is. It does this by repeatedly finding the difference between the lowest score and the correct score for each image.  With the output we can identify how to change the linear classifiers weights in order so the linear classifier will improve in its next pass. That was a very high level overview, now to look at exactly what is happening:</p>
+
+<p><img src="link" alt="SVM"></p>
+
+<p>Where S is a vector of class scores and 1 represents the safety margin. The scores are scale free and selected randomly. The max is taken in order to clamp possible loss at zero so negative numbers will not have a bearing on the overall loss of the function. If negative loss was allowed to pass through, it would decrease the overall loss which can distort the overall loss and make it seem like we are closer to identifying the correct scores even if we aren't. </p>
 
 <p>In this part of the assignment we first compute the loss and the gradient with loops before implementing a vectorized version.</p>
 
 <h3>
 <a id="with-loops" class="anchor" href="#with-loops" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>With Loops:</h3>
 
-<p>First off, I need to refer you to the <a href="http://cs231n.github.io/optimization-1/#analytic">course notes</a> as it goes through many aspects of this part of the assignment. Naturally it is a good idea to first start by implementing the SVM loss function at a single point. The equation for this looks like this:
-<img src="link" alt="svm"></p>
+<p>First off, I need to refer you to the <a href="http://cs231n.github.io/optimization-1/#analytic">course notes</a> as it goes through many aspects of this part of the assignment. Naturally it is a good idea to first start by implementing the SVM loss function at a single point. </p>
 
 <p>And the code would look like this:</p>
 
@@ -148,8 +156,9 @@ loss += 0.5 * reg * np.sum(W * W)
 return loss
 </code></pre>
 
-<p>From here it is relatively simple to incorporate the gradient. As the course notes tell us the equation for the gradient of an SVM can be found by taking the gradient with respect to (wyi):
-<img src="link" alt="gradient"></p>
+<p>From here it is relatively simple to incorporate the gradient. As the course notes tell us the equation for the gradient of an SVM can be found by taking the gradient with respect to (wyi):</p>
+
+<p><img src="https://github.com/georgewildridge/CS231n/blob/master/Website%20Pictures/SVMgradient.png" alt="gradient"></p>
 
 <p>It then goes on to tell us, and I quote, "when you’re implementing this in code you’d simply count the number of classes that didn’t meet the desired margin (and hence contributed to the loss function) and then the data vector (Xi) scaled by this number is the gradient".  So that is what we will do in the code:</p>
 
@@ -229,7 +238,7 @@ return loss, dW
 <h3>
 <a id="numerical-gradient" class="anchor" href="#numerical-gradient" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Numerical Gradient</h3>
 
-<p>Basically we could compute what we will come to call an analytic gradient by taking the slope in a bunch of directions through taking a series of tiny steps. Through this we are finding the gradient, or what direction is uphill, however we are trying to decrease our values so we will take the - of the gradient and take a small step down hill.   This method is effective but it is incredibly slow and computationally expensive… it is the reason people focused on feature detection for 50 years. Instead a technique called backpropagation can be used to expedite the process and make it much less computationally expensive. However, the Numerical gradient is still utilized as the analytic gradient is not as reliable as the numerical gradient, so (gradient checks) are performed on the analytic gradient with the numerical gradient. </p>
+<p>Basically we could compute what we will come toF call an analytic gradient by taking the slope in a bunch of directions through taking a series of tiny steps. Through this we are finding the gradient, or what direction is uphill, however we are trying to decrease our values so we will take the - of the gradient and take a small step down hill.   This method is effective but it is incredibly slow and computationally expensive… it is the reason people focused on feature detection for 50 years. Instead a technique called backpropagation can be used to expedite the process and make it much less computationally expensive. However, the Numerical gradient is still utilized as the analytic gradient is not as reliable as the numerical gradient, so (gradient checks) are performed on the analytic gradient with the numerical gradient. </p>
 
 <h3>
 <a id="analytic-gradient-backpropagation" class="anchor" href="#analytic-gradient-backpropagation" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Analytic Gradient: Backpropagation</h3>
@@ -259,14 +268,17 @@ return loss, dW
 <h2>
 <a id="softmax-classifier" class="anchor" href="#softmax-classifier" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Softmax Classifier</h2>
 
-<p>Again using the scores outputted from the linear classifier given random weights, the softmax classifier interprets the scores as the unnormalized log probabilities of the classes (Andrej mentioned the reason behind this interpretation is very complex). So we first exponentiate the scores, normalize them and then take the -log to retrieve the probabilities of the classes. We then attempt to maximize the log likelihood and minimize the -log likelihood of the true class. Two sets of course notes that were really helpful to me when I implemented this can be found <a href="http://cs231n.github.io/neural-networks-case-study/">here</a> and <a href="http://cs231n.github.io/linear-classify/">here</a>. Here is an equation for what I just described.
-<img src="link" alt="softmax"></p>
+<p>Again using the scores outputted from the linear classifier given random weights, the softmax classifier interprets the scores as the unnormalized log probabilities of the classes (Andrej mentioned the reason behind this interpretation is very complex). So we first exponentiate the scores, normalize them and then take the -log to retrieve the probabilities of the classes. We then attempt to maximize the log likelihood and minimize the -log likelihood of the true class. Two sets of course notes that were really helpful to me when I implemented this can be found <a href="http://cs231n.github.io/neural-networks-case-study/">here</a> and <a href="http://cs231n.github.io/linear-classify/">here</a>. Here is an equation for what I just described.</p>
 
-<p>The gradient of which would be:  **publish proof
-<img src="link" alt="gradient"></p>
+<p><img src="link" alt="softmax"></p>
 
-<p>The notes also emphasize a point on ensuring numerical stability as we could potentially be dealing with large numbers. They suggest we implement an equation like this:
-<img src="link" alt="Numerical Stability"></p>
+<p>The gradient of which would be:  **publish proof</p>
+
+<p><img src="link" alt="gradient"></p>
+
+<p>The notes also emphasize a point on ensuring numerical stability as we could potentially be dealing with large numbers. They suggest we implement an equation like this:</p>
+
+<p><img src="link" alt="Numerical Stability"></p>
 
 <p>Here is the implementation with loops:</p>
 
@@ -311,14 +323,17 @@ return loss, dW
 <h2>
 <a id="two-layer-neural-network" class="anchor" href="#two-layer-neural-network" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Two-Layer Neural Network</h2>
 
-<p>Looking at the equation of a neural network is probobly the best way to understand what exactly it is. Here's an equation for a 3 layer Neural Network:
-<a href="link">3 layer</a></p>
+<p>Looking at the equation of a neural network is probobly the best way to understand what exactly it is. Here's an equation for a 3 layer Neural Network:</p>
 
-<p>Now a two layer:
-<a href="link">2 layer</a></p>
+<p><img src="link" alt="3 layer"></p>
 
-<p>Finally a linear classifier:
-<a href="link">Linear classifier</a></p>
+<p>Now a two layer:</p>
+
+<p><img src="link" alt="2 layer"></p>
+
+<p>Finally a linear classifier:</p>
+
+<p><img src="link" alt="Linear classifier"></p>
 
 <p>It is just a matter of embedding linear classifiers within eachother, allowing for multiple sets of weights which means more detail about the image. In this part of the assignment we are asked to implement a two layer neural network. </p>
 
@@ -347,9 +362,15 @@ scores = np.dot(layer2,W2) + b2
 <p>The backward pass was more challenging; however, I was able to figure It out using the course notes on <a href="http://cs231n.github.io/optimization-2/">optimization</a> and <a href="http://cs231n.github.io/neural-networks-case-study/">neural networks</a>. 
 If the ReLU layer just equals:</p>
 
+<p>!(<a href="link">relu</a></p>
+
 <p>Then its gradient is:</p>
 
+<p><img src="link" alt="relugradient"></p>
+
 <p>As the first layer is just the softmax function again its gradient is:</p>
+
+<p>![</p>
 
 <p>Finally this step also calls for backpropagation, which is just the application of the chain rule:</p>
 
@@ -371,7 +392,7 @@ grads['b1'] = np.sum(dscores1, axis = 0)
 <h1>
 <a id="future-work" class="anchor" href="#future-work" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Future Work</h1>
 
-<p>When I reached this part of the course the lecture videos were taken down, as it took me an incredible amount of time to do this assignment with the lecture videos, my teacher and I decided to focus on a project or two that would both contribute to this course and prepare me for my summer internship. Here is a link to that repo and what exactly I finished my term with. However, I have not given up on this course, I still feel I have a tremendous amount to learn from it. But from my initial experience, I hope to revisit it some time next year after I have taken linear algebra and multivariable calculus so I am more capable of working through it independently. </p>
+<p>When I reached this part of the course the lecture videos were taken down, as it took me an incredible amount of time to do this assignment with the lecture videos, my teacher and I decided to focus on a project or two that would both contribute to this course and prepare me for my summer internship. Here is a link to that repo and what exactly I finished my term with. However, I have not given up on this course, I still feel I have a tremendous amount to learn from it. But from my initial experience, I hope to revisit it sometime next year after I have taken linear algebra and multivariable calculus so I am more capable of working through it independently. </p>
 
       <footer class="site-footer">
         <span class="site-footer-owner"><a href="https://github.com/georgewildridge/CS231n">CS231n</a> is maintained by <a href="https://github.com/georgewildridge">georgewildridge</a>.</span>
