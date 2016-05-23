@@ -149,13 +149,14 @@ for i in xrange(num_train):
 # to be an average instead so we divide by num_train.
 loss /= num_train
 
+
 # Add regularization to the loss.
 loss += 0.5 * reg * np.sum(W * W)
 
 return loss
 </code></pre>
 
-<p>Now to include the gradient. As the course notes tell us the equation for the gradient of an SVM can be found by taking the gradient with respect to (wyi):</p>
+<p>Now to include the gradient. As the course notes tell us the equation for the gradient of an SVM can be found by taking the gradient with respect to (wyi). The 1 in this equation is supposed to be an indicator function:</p>
 
 <p><img src="https://raw.githubusercontent.com/georgewildridge/CS231n/master/Website%20Pictures/SVMgradient.png" alt="gradient"></p>
 
@@ -198,13 +199,15 @@ return loss, dW
 <h3>
 <a id="vectorized" class="anchor" href="#vectorized" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Vectorized</h3>
 
-<p>Now for the hard part: vectorizing the equations we just used above. This is one of those cases where I resorted to <a href="http://networkflow.net/forum/19-stanford-cs231n-convolutional-neural-networks-for-visual-recognition/">the forum</a> for understanding after four or five hours of unsuccessful attempts. To be as clear as possible, this is not my code.  Although I have partial explanations in the comments, when I have time I plan on putting matrices next to this code for each step to show exactly what is happening. 
-    loss = 0.0
-    num_train = X.shape[0]
-    num_classes = W.shape[1]
-    dW = np.zeros(W.shape) # initialize the gradient as zero</p>
+<p>Now for the hard part: vectorizing the equations we just used above. This is one of those cases where I resorted to <a href="http://networkflow.net/forum/19-stanford-cs231n-convolutional-neural-networks-for-visual-recognition/">the forum</a> for understanding after four or five hours of unsuccessful attempts. To be as clear as possible, this is not my code.  Although I have partial explanations in the comments, when I have time I plan on putting matrices next to this code for each step to show exactly what is happening. </p>
 
-<pre><code>#Vectorized version of the SVM loss
+<pre><code>loss = 0.0
+num_train = X.shape[0]
+num_classes = W.shape[1]
+dW = np.zeros(W.shape) # initialize the gradient as zero
+
+
+#Vectorized version of the SVM loss
 score = X.dot(W) #linear classifier
 
 y_pred = score[range(score.shape[0]),y]  
