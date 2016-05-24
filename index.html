@@ -122,31 +122,44 @@ return dists
 <p><img src="https://raw.githubusercontent.com/georgewildridge/CS231n/master/Website%20Pictures/SVM.png" alt="SVM"></p>
 
 <p>Where x is a vector of images, w is a vector of weights, y is a vector of labels and delta represents the safety margin. 
-The max is taken in order to clamp possible loss at zero so negative numbers will not have a bearing on the overall loss of the function. If negative loss was allowed to pass through, it would decrease the overall loss which can distort the overall loss and make it seem like we are closer to identifying the correct scores even if we aren't. </p>
+The max is taken in order to clamp possible loss at zero so negative numbers will not have a bearing on the overall loss of the function. If negative loss was allowed to pass through, it would decrease the overall loss which can distort the overall loss and make it seem like we are closer to identifying the correct scores even if we aren't. 
+For the overall loss we must average the loss over all the images:
+<img src="https://raw.githubusercontent.com/georgewildridge/CS231n/master/Website%20Pictures/overallloss.png" alt="Overall Loss"></p>
 
 <p>In this part of the assignment we first compute the loss and the gradient with loops before implementing a vectorized version.</p>
 
 <h3>
 <a id="with-loops" class="anchor" href="#with-loops" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>With Loops:</h3>
 
-<p>First off, I need to refer you to the <a href="http://cs231n.github.io/optimization-1/#analytic">course notes</a> as it goes through many aspects of this part of the assignment. Naturally it is a good idea to start by implementing the SVM loss function:</p>
+<p>First off, I need to refer you to the <a href="http://cs231n.github.io/optimization-1/#analytic">course notes</a> as it goes through many aspects of this part of the assignment. Naturally it is a good idea to start by implementing the SVM loss function. After I implemented the loss function I also implemented something called  the regularization loss:
+<img src="https://raw.githubusercontent.com/georgewildridge/CS231n/master/Website%20Pictures/regularizationloss.png" alt="Regularization Loss"></p>
 
-<pre><code># compute the loss and the gradient
-num_classes = W.shape[1]  # how many classes
-num_train = X.shape[0] # how many images are in the training dataset
-loss = 0.0
-for i in xrange(num_train):
-    scores = X[i].dot(W) #linear classifier
-    dT = np.zeros(W.shape) # create an array the same size as the weight matrix made entirely out of zeros
-    correct_class_score = scores[y[i]]
-    for j in xrange(num_classes):
-        if j == y[i]: #importantly the loss is not calculated when you are comparing an image to itself as it would give a value of (delta) which would have a non universal affect on the overall loss. 
-            continue
-        margin = scores[j] - correct_class_score + 1 # note delta = 1
-        if margin &gt; 0:
-            loss += margin
-# Right now the loss is a sum over all training examples, but we want it
-# to be an average instead so we divide by num_train.
+<p>As the notes explain, regularization is important because often times there will be multiple sets of weights that will correctly classify the images. However, it is important to not be optimizing for all of them and instead be optimizing for only one set of weights. This is where regularization comes in. All regularization does is discourage large weights by using an "elementwise quadratic penalty". We then incorporate this into the loss function along with some hyper parameter lamda which controls how much effect the regularization loss has:
+<img src="https://raw.githubusercontent.com/georgewildridge/CS231n/master/Website%20Pictures/fullloss.png" alt="full loss"></p>
+
+<p>Or fully expanded:
+<img src="https://raw.githubusercontent.com/georgewildridge/CS231n/master/Website%20Pictures/svmexp.png" alt="expanded svm"></p>
+
+<p>After trying unsuccessfully to get the right gradient, I checked the forum and it actually turns out that the equation they use for regularization loss is:
+<img src="https://raw.githubusercontent.com/georgewildridge/CS231n/master/Website%20Pictures/regloss.png" alt="regularization loss"></p>
+
+<p>Now to implement the code:
+    # compute the loss and the gradient
+    num_classes = W.shape[1]  # how many classes
+    num_train = X.shape[0] # how many images are in the training dataset
+    loss = 0.0
+    for i in xrange(num_train):
+        scores = X[i].dot(W) #linear classifier
+        dT = np.zeros(W.shape) # create an array the same size as the weight matrix made entirely out of zeros
+        correct_class_score = scores[y[i]]
+        for j in xrange(num_classes):
+            if j == y[i]: #importantly the loss is not calculated when you are comparing an image to itself as it would give a value of (delta) which would have a non universal affect on the overall loss. 
+                continue
+            margin = scores[j] - correct_class_score + 1 # note delta = 1
+            if margin &gt; 0:
+                loss += margin</p>
+
+<pre><code># finding the overall loss
 loss /= num_train
 
 
@@ -160,7 +173,13 @@ return loss
 
 <p><img src="https://raw.githubusercontent.com/georgewildridge/CS231n/master/Website%20Pictures/SVMgradient.png" alt="gradient"></p>
 
-<p>It then goes on to tell us, and I quote, "when you’re implementing this in code you’d simply count the number of classes that didn’t meet the desired margin (and hence contributed to the loss function) and then the data vector (Xi) scaled by this number is the gradient".  So that is what we will do in the code:</p>
+<p>It then goes on to tell us, and I quote, "when you’re implementing this in code you’d simply count the number of classes that didn’t meet the desired margin (and hence contributed to the loss function) and then the data vector (Xi) scaled by this number is the gradient".  The equation above is only the gradient with respect to the row of W that "corresponds with the correct class." Where J does not equal yi the gradient is:
+<img src="https://raw.githubusercontent.com/georgewildridge/CS231n/master/Website%20Pictures/svmgradient1.png" alt="svm grad"></p>
+
+<p>Finally, we also must take the gradient of the regularization loss which comes out to:
+<img src="https://raw.githubusercontent.com/georgewildridge/CS231n/master/Website%20Pictures/gradreg.png" alt="gradient regularization"></p>
+
+<p>So we will implement all this in the code:</p>
 
 <pre><code># compute the loss and the gradient
 num_classes = W.shape[1] 
@@ -170,22 +189,22 @@ for i in xrange(num_train):
     scores = X[i].dot(W)
     dW = np.zeros(W.shape) #initializing the gradient
     correct_class_score = scores[y[i]]
-    gradCounter = 0
+    gradCounter = 0 #keeping track of the number of positive scores
     for j in xrange(num_classes):
         if j == y[i]:
             continue
         margin = scores[j] - correct_class_score + 1 
         if margin &gt; 0:
             loss += margin
-            dW[:,j] = X[i] #updating the gradient for incorrect rows
+            dW[:,j] = X[i] #updating the gradient for incorrect rows with the image
             gradCounter += 1
+    #adding the gradient to the column of the correct class
+    dW[:,y[i]] = -(gradCounter  * X[i])
 
-
-#adding the gradient to the column of the correct class
-dW[:,y[i]] = -(gradCounter  * X[i])
-
-
-dW = reg*W + (dW/num_train) #regularize the weights
+#regularize the gradient
+dW = reg*W 
+Full gradient:
+dW += dW/num_train 
 
 # We want the loss to be an average of all the training examples so we divide by num_train
 loss = loss/num_train
@@ -280,6 +299,8 @@ First they ask us to sample some batch size elements from the training data and 
 
 <p><img src="https://raw.githubusercontent.com/georgewildridge/CS231n/master/Website%20Pictures/numericalStability.png" alt="Numerical Stability"></p>
 
+<p>Further, the notes go on to tell us that it is common choice for C is to set:</p>
+
 <p>Here is the implementation with loops:</p>
 
 <h3>
@@ -287,20 +308,21 @@ First they ask us to sample some batch size elements from the training data and 
 
 <pre><code>#Initialize the loss and gradient to zero.
 loss = 0.0
-dW = np.zeros_like(W)
+dW = np.zeros(W.shape)
 
 num_classes = W.shape[1]
 num_train = X.shape[0]
 for i in xrange(num_train):
-    scores = X[i].dot(W)
+    scores = X[i].dot(W) #linear classifier
     scores -= np.max(scores)  #numerical stability 
-    prob = np.exp(scores)/np.sum(np.exp(scores), axis=1, keepdims = True) #exponentiation and normilizaation
+    prob = np.exp(scores)/np.sum(np.exp(scores), axis=1, keepdims = True) #exponentiation and normalization
     loss += -np.log(prob[y[i]])  #-log
     for j in xrange(num_classes):
         dW[:,j] += (prob[j]-(j == y[i])) * X[i] #updating the gradient
-loss /= num_train #averaging the loss
-loss += 0.5 * reg * np.sum(W * W) #normalizing
-dW = (1.0/num_train)*dW + reg*W
+loss /= num_train #overall loss
+loss += 0.5 * reg * np.sum(W * W) #regularization
+dW = (1.0/num_train)*dW 
+dW += reg*W #weight regularization
 
 return loss, dW
 </code></pre>
@@ -378,7 +400,7 @@ If the ReLU layer just equals:</p>
 
 <p><img src="https://raw.githubusercontent.com/georgewildridge/CS231n/master/Website%20Pictures/softmaxgradient.png" alt="softmaxgradient"></p>
 
-<p>Finally this step also calls for backpropagation, which is just the application of the chain rule:</p>
+<p>Where P is a vector of normalized probabilities. Finally this step also calls for backpropagation, which is just the application of the chain rule:</p>
 
 <pre><code>dscores = prob #softmax
 dscores[xrange(N),y] -= 1 #gradient of softmax
