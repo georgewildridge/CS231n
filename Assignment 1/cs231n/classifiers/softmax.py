@@ -37,7 +37,7 @@ def softmax_loss_naive(W, X, y, reg):
     prob = np.exp(scores)/np.sum(np.exp(scores)) #exponentiation and normilizaation
     loss += -np.log(prob[y[i]]) 
     for j in xrange(num_classes):
-      dW[:,j] += (prob[j]-(j == y[i])) * X[i]
+      dW[:,j] += (prob[j]-(j == y[i])) 
   loss /= num_train
   loss += 0.5 * reg * np.sum(W * W)
   dW = (1.0/num_train)*dW + reg*W
