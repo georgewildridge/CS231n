@@ -95,7 +95,7 @@ return dists
 return dists
 </code></pre>
 
-<p>To put this into perspective I will do it on a much simpler scale. Instead of dealing with these huge matricies, pretend we are just working with two vectors, q and p. To find the <a href="https://en.wikipedia.org/wiki/Euclidean_distance">Euclidean distance</a> between these two vectors we find the length of its distance vector:</p>
+<p>To put this into perspective I will do it on a much simpler scale. Instead of dealing with these huge matrices, pretend we are just working with two vectors, q and p. To find the <a href="https://en.wikipedia.org/wiki/Euclidean_distance">Euclidean distance</a> between these two vectors we find the length of its distance vector:</p>
 
 <p><img src="https://upload.wikimedia.org/math/c/5/4/c54c79bb419dec31d93260cb9207a1d5.png" alt="Euclidean length of distance vector"></p>
 
@@ -108,11 +108,11 @@ return dists
 <h2>
 <a id="linear-classifier" class="anchor" href="#linear-classifier" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Linear Classifier</h2>
 
-<p>Although this is not a direct part of the assignment, it is necessary to understand what exactly the Support Vector Machine and the Softmax classifier are doing… so bear with me. A linear classifier involves an input (an image in this case) and a set of initially arbitrary parameters known as weights. Then we have some function. Here it is in its most basic form:</p>
+<p>Although this is not a direct part of the assignment, it is necessary to understand what exactly the Support Vector Machine and the Softmax classifier are doing. A linear classifier involves an input(an image in this case) and a set of initially arbitrary parameters known as weights. Here it is in its most basic form:</p>
 
 <p><img src="https://raw.githubusercontent.com/georgewildridge/CS231n/master/Website%20Pictures/linear.png" alt="linear classifier"></p>
 
-<p>Where x is the image's pixels (stretched into one column) and W is a one column matrix with as many rows as classes. When the two are multiplied together we get a score for each class. Basically we are computing a weighted sum of all the pixel values for each score. Ideally when we pass an image through, the correct classifier will have the lowest score; however, this is often not the case which is where the SVM and the softmax classifier come in. It is important to note that the scores will be score free, and when first training a linear classifier, selected at random. </p>
+<p>Where x is the image's pixels (stretched into one column) and W is a one column matrix with as many rows as there are classes. When the two are multiplied together we get a score for each class. Basically we are computing a weighted sum of all the pixel values for each score.  Ideally when we pass an image through, the correct classifier will have the highest score; however, this is often not the case which is where the SVM and the Softmax classifier come in. These classifiers are used to interpret the scores and quantify how poorly our linear classifier is working.  can be used It is important to note that the scores will be score free, and when first training a linear classifier, selected at random. </p>
 
 <h2>
 <a id="support-vector-machine" class="anchor" href="#support-vector-machine" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Support Vector Machine</h2>
@@ -121,10 +121,13 @@ return dists
 
 <p><img src="https://raw.githubusercontent.com/georgewildridge/CS231n/master/Website%20Pictures/SVM.png" alt="SVM"></p>
 
-<p>Where x is a vector of images, w is a vector of weights, y is a vector of labels and delta represents the safety margin. 
+<p>Where Li is the loss for a single training example, x is a vector of images, w is a vector of weights, y is a vector of labels and delta represents the safety margin. 
 The max is taken in order to clamp possible loss at zero so negative numbers will not have a bearing on the overall loss of the function. If negative loss was allowed to pass through, it would decrease the overall loss which can distort the overall loss and make it seem like we are closer to identifying the correct scores even if we aren't. 
-For the overall loss we must average the loss over all the images:
-<img src="https://raw.githubusercontent.com/georgewildridge/CS231n/master/Website%20Pictures/overallloss.png" alt="Overall Loss"></p>
+For the overall loss we must average the loss over all the images:</p>
+
+<p><img src="https://raw.githubusercontent.com/georgewildridge/CS231n/master/Website%20Pictures/overallloss.png" alt="Overall Loss"></p>
+
+<p>Where N is the number of training examples. </p>
 
 <p>In this part of the assignment we first compute the loss and the gradient with loops before implementing a vectorized version.</p>
 
@@ -133,6 +136,8 @@ For the overall loss we must average the loss over all the images:
 
 <p>First off, I need to refer you to the <a href="http://cs231n.github.io/optimization-1/#analytic">course notes</a> as it goes through many aspects of this part of the assignment. Naturally it is a good idea to start by implementing the SVM loss function. After I implemented the loss function I also implemented something called  the regularization loss:
 <img src="https://raw.githubusercontent.com/georgewildridge/CS231n/master/Website%20Pictures/regularizationloss.png" alt="Regularization Loss"></p>
+
+<p>Regularization of the Weights(W).</p>
 
 <p>As the notes explain, regularization is important because often times there will be multiple sets of weights that will correctly classify the images. However, it is important to not be optimizing for all of them and instead be optimizing for only one set of weights. This is where regularization comes in. All regularization does is discourage large weights by using an "elementwise quadratic penalty". We then incorporate this into the loss function along with some hyper parameter lamda which controls how much effect the regularization loss has:
 <img src="https://raw.githubusercontent.com/georgewildridge/CS231n/master/Website%20Pictures/fullloss.png" alt="full loss"></p>
@@ -291,6 +296,8 @@ First they ask us to sample some batch size elements from the training data and 
 
 <p><img src="https://raw.githubusercontent.com/georgewildridge/CS231n/master/Website%20Pictures/softmax.png" alt="softmax"></p>
 
+<p>Where Li is the loss for a single example, f is the array of class scores for a single example. </p>
+
 <p>The gradient of which would be: </p>
 
 <p><img src="https://raw.githubusercontent.com/georgewildridge/CS231n/master/Website%20Pictures/softmaxgradient.png" alt="gradient"></p>
@@ -368,7 +375,7 @@ return loss, dW
 
 <p>The first three lines of code are simply executing the equation for the two layer neural net described above. </p>
 
-<pre><code>layer1 = np.dot(X,W1) + b1
+<pre><code>layer1 = np.dot(X,W1) + b1 
 layer2 = np.maximum(0,layer1)
 scores = np.dot(layer2,W2) + b2
 </code></pre>
