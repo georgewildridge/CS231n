@@ -150,7 +150,7 @@ For the overall loss we must average the loss over all the images:</p>
 
 <p>Now to implement the code:</p>
 
-<pre><code># compute the loss and the gradient
+<pre><code># compute the loss
 num_classes = W.shape[1]  # how many classes
 num_train = X.shape[0] # how many images are in the training dataset
 loss = 0.0
@@ -179,13 +179,15 @@ return loss
 
 <p><img src="https://raw.githubusercontent.com/georgewildridge/CS231n/master/Website%20Pictures/SVMgradient.png" alt="gradient"></p>
 
-<p>It then goes on to tell us, and I quote, "when you’re implementing this in code you’d simply count the number of classes that didn’t meet the desired margin (and hence contributed to the loss function) and then the data vector (Xi) scaled by this number is the gradient".  The equation above is only the gradient with respect to the row of W that "corresponds with the correct class." Where J does not equal yi the gradient is:
-<img src="https://raw.githubusercontent.com/georgewildridge/CS231n/master/Website%20Pictures/svmgradient1.png" alt="svm grad"></p>
+<p>It then goes on to tell us, and I quote, "when you’re implementing this in code you’d simply count the number of classes that didn’t meet the desired margin (and hence contributed to the loss function) and then the data vector (Xi) scaled by this number is the gradient".  The equation above is only the gradient with respect to the row of W that "corresponds with the correct class." Where J does not equal yi the gradient is:</p>
 
-<p>Finally, we also must take the gradient of the regularization loss which comes out to:
-<img src="https://raw.githubusercontent.com/georgewildridge/CS231n/master/Website%20Pictures/gradreg.png" alt="gradient regularization"></p>
+<p><img src="https://raw.githubusercontent.com/georgewildridge/CS231n/master/Website%20Pictures/svmgradient1.png" alt="svm grad"></p>
 
-<p>So we will implement all this in the code:</p>
+<p>Finally, we also must take the gradient of the regularization loss which comes out to:</p>
+
+<p><img src="https://raw.githubusercontent.com/georgewildridge/CS231n/master/Website%20Pictures/gradreg.png" alt="gradient regularization"></p>
+
+<p>So we will include the gradient:</p>
 
 <pre><code># compute the loss and the gradient
 num_classes = W.shape[1] 
@@ -238,7 +240,7 @@ score = X.dot(W) #linear classifier
 y_pred = score[range(score.shape[0]),y]  
 
 #SVM loss
-margins = score - y_pred[:,None] + 1
+margins = score - y_pred[:,None] + 1 #
 margins[range(score.shape[0]),y] = 0
 margins = np.maximum(np.zeros(margins.shape),margins)
 loss = np.sum(margins) 
@@ -303,11 +305,13 @@ First they ask us to sample some batch size elements from the training data and 
 
 <p><img src="https://raw.githubusercontent.com/georgewildridge/CS231n/master/Website%20Pictures/softmaxgradient.png" alt="gradient"></p>
 
-<p>The notes also emphasize a point on ensuring numerical stability as we could potentially be dealing with large numbers. They suggest we implement an equation like this:</p>
+<p>Where P is a vector of the normalized probabilities. The notes also emphasize a point on ensuring numerical stability as we could potentially be dealing with large numbers. They suggest we implement an equation like this:</p>
 
 <p><img src="https://raw.githubusercontent.com/georgewildridge/CS231n/master/Website%20Pictures/numericalStability.png" alt="Numerical Stability"></p>
 
 <p>Further, the notes go on to tell us that it is common choice for C is to set:</p>
+
+<p><img src="https://raw.githubusercontent.com/georgewildridge/CS231n/master/Website%20Pictures/numstabmax.png" alt="Numerical Stability"></p>
 
 <p>Here is the implementation with loops:</p>
 
