@@ -361,7 +361,7 @@ return loss, dW
 <h2>
 <a id="two-layer-neural-network" class="anchor" href="#two-layer-neural-network" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Two-Layer Neural Network</h2>
 
-<p>Looking at the equation of a neural network is probobly the best way to understand what exactly it is. Here's an equation for a 3 layer Neural Network:</p>
+<p>Looking at the equation of a neural network is probably the best way to understand what exactly it is. Here's an equation for a 3 layer Neural Network:</p>
 
 <p><img src="https://raw.githubusercontent.com/georgewildridge/CS231n/master/Website%20Pictures/theelayer.png" alt="3 layer"></p>
 
@@ -385,7 +385,7 @@ layer2 = np.maximum(0,layer1)
 scores = np.dot(layer2,W2) + b2
 </code></pre>
 
-<p>This is just the soft max loss with some minor adjustments as we are dealing with two sets of weights. Notably the hidden layer uses a "ReLU" non-linearity. This is function just means to take the maximum of 0 and x.</p>
+<p>This is just the soft max loss with some minor adjustments as we are dealing with two sets of weights. Notably the hidden layer uses a "ReLU" non-linearity. This function just means to take the maximum of 0 and x.</p>
 
 <pre><code>#softmax loss
 scores -= np.max(scores,axis=1)[:,np.newaxis]
