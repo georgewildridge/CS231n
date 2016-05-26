@@ -112,7 +112,7 @@ return dists
 
 <p><img src="https://raw.githubusercontent.com/georgewildridge/CS231n/master/Website%20Pictures/linear.png" alt="linear classifier"></p>
 
-<p>Where x is the image's pixels (stretched into one column) and W is a one column matrix with as many rows as there are classes. When the two are multiplied together we get a score for each class. Basically we are computing a weighted sum of all the pixel values for each score.  Ideally when we pass an image through, the correct classifier will have the highest score; however, this is often not the case which is where the SVM and the Softmax classifier come in. These classifiers are used to interpret the scores and quantify how poorly our linear classifier is working.  can be used It is important to note that the scores will be score free, and when first training a linear classifier, selected at random. </p>
+<p>Where x is the image's pixels (stretched into one row) and W is a one column matrix with as many rows as there are classes. When the two are multiplied together we get a score for each class. Basically we are computing a weighted sum of all the pixel values for each score.  Ideally when we pass an image through, the correct classifier will have the highest score; however, this is often not the case which is where the SVM and the Softmax classifier come in. These classifiers are used to interpret the scores and quantify how poorly our linear classifier is working.  can be used It is important to note that the scores will be score free, and when first training a linear classifier, selected at random. </p>
 
 <h2>
 <a id="support-vector-machine" class="anchor" href="#support-vector-machine" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Support Vector Machine</h2>
@@ -148,23 +148,24 @@ For the overall loss we must average the loss over all the images:</p>
 <p>After trying unsuccessfully to get the right gradient, I checked the forum and it actually turns out that the equation they use for regularization loss is:
 <img src="https://raw.githubusercontent.com/georgewildridge/CS231n/master/Website%20Pictures/regloss.png" alt="regularization loss"></p>
 
-<p>Now to implement the code:
-    # compute the loss and the gradient
-    num_classes = W.shape[1]  # how many classes
-    num_train = X.shape[0] # how many images are in the training dataset
-    loss = 0.0
-    for i in xrange(num_train):
-        scores = X[i].dot(W) #linear classifier
-        dT = np.zeros(W.shape) # create an array the same size as the weight matrix made entirely out of zeros
-        correct_class_score = scores[y[i]]
-        for j in xrange(num_classes):
-            if j == y[i]: #importantly the loss is not calculated when you are comparing an image to itself as it would give a value of (delta) which would have a non universal affect on the overall loss. 
-                continue
-            margin = scores[j] - correct_class_score + 1 # note delta = 1
-            if margin &gt; 0:
-                loss += margin</p>
+<p>Now to implement the code:</p>
 
-<pre><code># finding the overall loss
+<pre><code># compute the loss and the gradient
+num_classes = W.shape[1]  # how many classes
+num_train = X.shape[0] # how many images are in the training dataset
+loss = 0.0
+for i in xrange(num_train):
+    scores = X[i].dot(W) #linear classifier
+    dT = np.zeros(W.shape) # create an array the same size as the weight matrix made entirely out of zeros
+    correct_class_score = scores[y[i]]
+    for j in xrange(num_classes):
+        if j == y[i]: #importantly the loss is not calculated when you are comparing an image to itself as it would give a value of (delta) which would have a non universal affect on the overall loss. 
+            continue
+        margin = scores[j] - correct_class_score + 1 # note delta = 1
+        if margin &gt; 0:
+            loss += margin
+
+# finding the overall loss
 loss /= num_train
 
 
